@@ -1,9 +1,17 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:smartbill/views/home/home_screen.dart';
-import 'package:smartbill/views/login/login_screen.dart';
-import 'package:smartbill/views/splash/splash.dart';
+import 'package:smartbill/screens/home/home_screen.dart';
+import 'package:smartbill/screens/splash/splash.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: const FirebaseOptions(
+      apiKey: "AIzaSyDPK3kX-TfPeKY_qKAqoi81VRTiII7tPRc",
+      appId: "1:1005746669910:android:720e57be651775f90e2ef7",
+      messagingSenderId: "1005746669910",
+      projectId: "smartbill-flutter")
+  );
   runApp(const MyApp());
 }
 
@@ -17,7 +25,6 @@ class MyApp extends StatelessWidget {
       initialRoute: '/splash',
       routes: {
         '/splash': (context) => const SplashScreen(),
-        '/login': (context) => const LoginScreen(),
         '/home': (context) => const HomeScreen()
       },
       title: 'Smartbill',

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1005746669910",
+    "project_id": "smartbill-flutter",
+    "storage_bucket": "smartbill-flutter.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1005746669910:android:720e57be651775f90e2ef7",
+        "android_client_info": {
+          "package_name": "com.smartbill.mobile"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDPK3kX-TfPeKY_qKAqoi81VRTiII7tPRc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
