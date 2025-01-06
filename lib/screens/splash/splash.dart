@@ -1,8 +1,7 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:animated_splash_screen/animated_splash_screen.dart';
-import 'package:smartbill/screens/home/home_screen.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:smartbill/screens/wrapper.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -16,13 +15,11 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
 
-    Timer(const Duration(seconds: 3), () => Navigator.of(context).pushReplacementNamed('/home'));
-
     return Scaffold(
         body: Center(
           child: AnimatedSplashScreen(
             duration: 5000,
-            nextScreen: const HomeScreen(),
+            nextScreen: const Wrapper(),
             splashTransition: SplashTransition.fadeTransition,
             splashIconSize: 180,
             splash: SvgPicture.asset(

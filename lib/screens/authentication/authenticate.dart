@@ -18,24 +18,20 @@ class _AuthenticateScreenState extends State<AuthenticateScreen> {
   final TextEditingController _phoneText = TextEditingController();
   String fullphone = "";
   String? _verificationId;
-  bool _isLoading = false;
+  bool isLoading = false;
 
   String dropdownvalue = countryCode.first;
 
   //Snackbar in cade of error phone
   void _showSnackbarEmptyPhone() {
-    const snackbar = SnackBar(content: Text("Ingresa tu numero"), duration: Duration(seconds: 2));
-
-    FocusScope.of(context).unfocus();
+    const snackbar = SnackBar(content: Text("Ingresa tu número"), duration: Duration(seconds: 2));
 
     ScaffoldMessenger.of(context).showSnackBar(snackbar);
   }
 
   //Snackbar invalid phone number
   void _showSnackbarcInvalidPhone() {
-    const snackbar = SnackBar(content: Text("Numero invalido"), duration: Duration(seconds: 2));
-
-    FocusScope.of(context).unfocus();
+    const snackbar = SnackBar(content: Text("Número invalido"), duration: Duration(seconds: 2));
 
     ScaffoldMessenger.of(context).showSnackBar(snackbar);
     
@@ -44,17 +40,27 @@ class _AuthenticateScreenState extends State<AuthenticateScreen> {
 
 
   //SIGN IN WITH PHONE
-  void _startPhoneAuth() async {
+  Future<void> _startPhoneAuth() async {
+
     setState(() {
-      _isLoading = true;
-      fullphone = dropdownvalue + _phoneText.text.trim();
+      isLoading = true;
     });
 
-    if (_phoneText.text.trim() == "") {
+    fullphone = dropdownvalue + _phoneText.text.trim();
+
+    FocusScope.of(context).unfocus();
+
+    if (_phoneText.text.trim() == "") {     
+
       _showSnackbarEmptyPhone();
+
+      setState(() {
+        isLoading = false;
+      });
+
     } else {
 
-      _auth.verifyPhone(context: context, phone: fullphone, codeSentCallback: (verificationId) {
+      await _auth.verifyPhone(context: context, phone: fullphone, codeSentCallback: (verificationId) {
             print("IT ENTERED CODE SENT");
 
             setState(() {
@@ -67,16 +73,17 @@ class _AuthenticateScreenState extends State<AuthenticateScreen> {
                     builder: (context) => OtpScreen(code: _verificationId)));
           },
           codeErrorCallback: (message) {
-            print("Error en entrtar: ${message}");
+            print("Error en entrar: ${message}");
             _showSnackbarcInvalidPhone();
+
+            setState(() {
+              isLoading = false;
+            });
+
           });
 
-      await Future.delayed(const Duration(seconds: 3));
     }
-
-    setState(() {
-      _isLoading = false;
-    });
+    
   }
 
   @override
@@ -88,44 +95,51 @@ class _AuthenticateScreenState extends State<AuthenticateScreen> {
         title: const Text("Registrate"),
       ),
       body: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 70),
+        padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 70),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             const PhoneImage(),
             //Add phone number. Country code with a dropdownmenu and number input
             Row(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 //Dropdownmenu of country doe
-                DropdownButton(
-                  style: const TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.black),
-                  value: dropdownvalue,
-                  onChanged: <String>(value) {
-                    setState(() {
-                      dropdownvalue = value!;
-                    });
-                  },
-                  items: countryCode.map((item) {
-                    return DropdownMenuItem(
-                      value: item,
-                      child: Text(item),
-                    );
-                  }).toList(),
+                DropdownButtonHideUnderline(
+                  child: DropdownButton(
+                    style: const TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.black),
+                    value: dropdownvalue,
+                    onChanged: <String>(value) {
+                      setState(() {
+                        dropdownvalue = value!;
+                      });
+                    },
+                    items: countryCode.map((item) {
+                      return DropdownMenuItem(
+                        value: item,
+                        child: Text(item),
+                      );
+                    }).toList(),
+                  ),
                 ),
                 // Input of phone number
                 SizedBox(
-                    width: 220,
-                    child: TextField(
-                      controller: _phoneText,
-                      keyboardType: TextInputType.number,
-                      inputFormatters: [
-                        FilteringTextInputFormatter.digitsOnly
-                      ],
-                      style: const TextStyle(fontSize: 20),
-                      decoration:
-                          const InputDecoration(label: Text("Telefono")),
+                    width: 250,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 15),
+                      child: TextField(
+                        controller: _phoneText,
+                        keyboardType: TextInputType.number,
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly
+                        ],
+                        style: const TextStyle(fontSize: 21, letterSpacing: 3, fontWeight: FontWeight.w500),
+                        decoration:
+                            const InputDecoration(label: Text("Telefono")),
+                      ),
                     ))
               ],
             ),
@@ -133,18 +147,16 @@ class _AuthenticateScreenState extends State<AuthenticateScreen> {
             const SizedBox(height: 30),
 
             //Submit button
-            SizedBox(
+            isLoading ? const CircularProgressIndicator() : SizedBox(
               height: 50,
-              width: MediaQuery.of(context).size.width - 30,
+              width: MediaQuery.of(context).size.width - 40,
               child: ElevatedButton(
                   style: const ButtonStyle(
-                      backgroundColor: WidgetStatePropertyAll(Colors.blueGrey)),
+                      backgroundColor: WidgetStatePropertyAll(Color.fromARGB(255, 75, 78, 80))),
                   onPressed: _startPhoneAuth,
-                  child: _isLoading
-                      ? const CircularProgressIndicator()
-                      : const Text(
-                          "Enviar codigo",
-                          style: TextStyle(color: Colors.white),
+                  child: const Text(
+                          "Enviar código",
+                          style: TextStyle(color: Colors.white, fontSize: 18),
                         )),
             ),
           ],

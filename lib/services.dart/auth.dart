@@ -1,12 +1,19 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:smartbill/screens/dashboard/dashboard.dart';
+import 'package:smartbill/screens/home/home_screen.dart';
 
 
 class AuthService {
 
   //Declaring an instance of firebase auth
   final FirebaseAuth _auth = FirebaseAuth.instance;
+
+
+  //Stablish stream of user
+  Stream<User?> get user {
+    return _auth.authStateChanges();
+  }
 
 
   //Authentication with phone number
@@ -22,7 +29,7 @@ class AuthService {
 
           await _auth.signInWithCredential(credential);
 
-          Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const DashboardScreen()), (Route<dynamic> route) => false,);
+          Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) => const DashboardScreen()), (r) => false);
 
           print("COMPLETED AUTO AUTENTICATION");
 
@@ -30,7 +37,7 @@ class AuthService {
         verificationFailed: (FirebaseException e) {
           codeErrorCallback(e.message ?? "Authentication failed: ${e.message}");
         },
-        codeSent: (String verificationId, int? resendToken) {
+        codeSent: (String verificationId, int? resendToken) async {
           codeSentCallback(verificationId);
         },
         codeAutoRetrievalTimeout: (String verificationId) {}
@@ -57,6 +64,25 @@ class AuthService {
 
   }
 
+
+
+
+  //Log out of Firebase
+
+  Future logout(BuildContext context) async {
+
+    try {
+      await _auth.signOut();
+      Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) => const HomeScreen()), (r) => false);
+
+      print("Logged out");
+
+    } catch(e) {
+      print("THERE WAS AN ERROR: $e");
+    }
+    
+
+  }
   
 
 

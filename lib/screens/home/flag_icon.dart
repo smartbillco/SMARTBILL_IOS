@@ -1,51 +1,69 @@
 import 'package:flutter/material.dart';
+import 'package:smartbill/screens/models/country.dart';
 
 class FlagIcon extends StatefulWidget {
-  const FlagIcon({super.key});
+  final Function(Country) changeFlag;
+  const FlagIcon({super.key, required this.changeFlag});
+
 
   @override
   State<FlagIcon> createState() => _FlagIconState();
 }
 
 class _FlagIconState extends State<FlagIcon> {
-  
-  String _flag = "assets/images/colombian_flag.png";
 
-  void changeFlag(String newFlagAsset) {
+
+  Country colombia = Country(id: 1, flag: "assets/images/colombian_flag.png", name: "Colombia", currency: "COP");
+  Country peru = Country(id: 2, flag: "assets/images/peruvian_flag.png", name: "Peru", currency: "PEN");
+  
+  Country _currentCountry = Country(id: 1, flag: "assets/images/colombian_flag.png", name: "Colombia",  currency: "COP");
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    _currentCountry = colombia;
+  }
+
+  void changeFlag(Country newCountry) { 
     setState(() {
-      _flag = newFlagAsset;
+      _currentCountry = newCountry;
     });
+    widget.changeFlag(_currentCountry);
   }
 
   @override
   Widget build(BuildContext context) {
+
+
     return PopupMenuButton(
         style: const ButtonStyle(
             iconColor: WidgetStatePropertyAll(Colors.white),
             iconSize: WidgetStatePropertyAll(30)),
-        icon: Image(image: AssetImage(_flag)),
+        icon: Image(image: AssetImage(_currentCountry.flag)),
         itemBuilder: (BuildContext context) => [
               PopupMenuItem(
                 onTap: () {
-                  changeFlag("assets/images/colombian_flag.png");
+                  changeFlag(colombia);
                 },
-                child: const Row(
+                child: Row(
                   children: <Widget>[
-                    Image(image: AssetImage("assets/images/colombian_flag.png"), width: 40, height: 40,),
-                    SizedBox(width: 20,),
-                    Text("Colombia")
+                    Image(image: AssetImage(colombia.flag), width: 40, height: 40,),
+                    const SizedBox(width: 20,),
+                    Text(colombia.name)
                   ]
                 )
               ),
               PopupMenuItem(
                 onTap: () {
-                  changeFlag("assets/images/peruvian_flag.png");
+                  changeFlag(peru);
                 },
-                child: const Row(
+                child: Row(
                   children: <Widget>[
-                    Image(image: AssetImage("assets/images/peruvian_flag.png"), width: 40, height: 40,),
+                    Image(image: AssetImage(peru.flag), width: 40, height: 40,),
                     SizedBox(width: 20,),
-                    Text("Peru")
+                    Text(peru.name)
                   ]
                 )
               )
