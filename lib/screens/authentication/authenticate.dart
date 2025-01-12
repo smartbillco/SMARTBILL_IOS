@@ -73,7 +73,7 @@ class _AuthenticateScreenState extends State<AuthenticateScreen> {
                     builder: (context) => OtpScreen(code: _verificationId)));
           },
           codeErrorCallback: (message) {
-            print("Error en entrar: ${message}");
+            print("Error en entrar: $message");
             _showSnackbarcInvalidPhone();
 
             setState(() {

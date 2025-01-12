@@ -9,9 +9,9 @@ class Xmlhandler {
     final Map<String, dynamic> map = {};
 
     // If the element has attributes, add them to the map
-    element.attributes.forEach((attribute) {
+    for (var attribute in element.attributes) {
       map[attribute.name.toString()] = attribute.value;
-    });
+    }
 
     // Add children or text content
     for (final node in element.children) {
@@ -35,7 +35,7 @@ class Xmlhandler {
 
       final xmlDocument = XmlDocument.parse(fileData);
 
-      Map<String, dynamic> parsedMap = this.xmlToMap(xmlDocument.rootElement);
+      Map<String, dynamic> parsedMap = xmlToMap(xmlDocument.rootElement);
 
       return parsedMap;
 

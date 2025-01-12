@@ -41,7 +41,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     if(mounted) {
       setState(() {
-        data = response['conversion_rates']['${_currentCountry.currency}'].toStringAsFixed(2);
+        data = response['conversion_rates'][_currentCountry.currency].toStringAsFixed(2);
       });
 
     }

@@ -62,7 +62,7 @@ class _FlagIconState extends State<FlagIcon> {
                 child: Row(
                   children: <Widget>[
                     Image(image: AssetImage(peru.flag), width: 40, height: 40,),
-                    SizedBox(width: 20,),
+                    const SizedBox(width: 20,),
                     Text(peru.name)
                   ]
                 )

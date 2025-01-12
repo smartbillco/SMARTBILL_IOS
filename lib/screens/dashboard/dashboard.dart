@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:smartbill/screens/dashboard/qr_scanner.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:smartbill/services.dart/auth.dart';
 import 'package:smartbill/services.dart/xml.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -19,7 +18,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   final Xmlhandler xmlhandler = Xmlhandler();
   Map? customer;
   Map? company;
-  Map? _fileContent;
+  Map _fileContent = {};
   String? extractedData;
   String? name;
   final AuthService _auth = AuthService();
@@ -49,12 +48,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
       );
 
       if(fileResult != null) {
+        
         Map parsedContent = await xmlhandler.getXml(fileResult.files.single.path!);
 
           setState(() {
             _fileContent = parsedContent;
-            customer = _fileContent?['cac:ReceiverParty']['cac:PartyTaxScheme'];
-            company = _fileContent?['cac:SenderParty']['cac:PartyTaxScheme'];
+            customer = _fileContent['cac:ReceiverParty']['cac:PartyTaxScheme'];
+            company = _fileContent['cac:SenderParty']['cac:PartyTaxScheme'];
 
           });
 
@@ -62,7 +62,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
       } else {
         setState(() {
-          _fileContent = {"response":"Se cancelo la busqueda de archivos"};
+          _fileContent = {};
         });
       }
 
@@ -121,7 +121,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
                 ],
               ),
-              SizedBox(height: 30),
+              const SizedBox(height: 30),
               InkWell(
                 onTap: () {
                   launchUrl(Uri.parse(_result!));
@@ -131,7 +131,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
               Expanded(
               child: SingleChildScrollView(
-                child: _fileContent != null
+                child: _fileContent.isNotEmpty
                     ? SizedBox(
                       width: MediaQuery.of(context).size.width,
                       child: Card(
@@ -149,13 +149,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 ],
                               ),
                               Text("Cedula: ${customer?['cbc:CompanyID']['text']}"),
-                              Text("Empresa: ${company?['cbc:RegistrationName']['text']}", style: TextStyle(fontWeight: FontWeight.w500, color: Colors.blueAccent)),
+                              Text("Empresa: ${company?['cbc:RegistrationName']['text']}", style: const TextStyle(fontWeight: FontWeight.w500, color: Colors.blueAccent)),
                             ],
                           ),
                         ),
                       ),
                     )
-                    : const Text(''),
+                    : const Text("No hay archivo seleccionado"),
               ),
             ),
               

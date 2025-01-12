@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:pinput/pinput.dart';
 import 'package:smartbill/screens/dashboard/dashboard.dart';
 import 'package:smartbill/services.dart/auth.dart';
@@ -33,7 +32,6 @@ class _OtpScreenState extends State<OtpScreen> {
     if (user != null) {
       Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(builder: (context) => const DashboardScreen()), (r) => false);
-      ;
     }
 
     if (user == null) {
@@ -96,7 +94,7 @@ class _OtpScreenState extends State<OtpScreen> {
                     color: Color.fromRGBO(30, 60, 87, 1),
                     fontWeight: FontWeight.w600),
                 decoration: BoxDecoration(
-                  border: Border.all(color: Color.fromARGB(255, 75, 78, 80)),
+                  border: Border.all(color: const Color.fromARGB(255, 75, 78, 80)),
                   borderRadius: BorderRadius.circular(10),
                 ),
               ),

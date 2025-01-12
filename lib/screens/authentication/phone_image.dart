@@ -12,7 +12,7 @@ class PhoneImage extends StatelessWidget {
         Text("Ingresa tu número: ", style: TextStyle(fontSize: 21),),
         SizedBox(height: 30,),
         Text(
-            "Te enviremos un mensaje de texto con tu código de verificación",
+            "Te enviaremos un mensaje de texto con tu código de verificación",
             textAlign: TextAlign.center,
             style: TextStyle(fontSize: 17)),
         SizedBox(height: 20,),
