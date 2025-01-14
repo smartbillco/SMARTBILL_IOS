@@ -4,6 +4,7 @@ import 'package:smartbill/services.dart/auth.dart';
 import 'package:smartbill/services.dart/xml.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:xml/xml.dart';
 
 
 class DashboardScreen extends StatefulWidget {
@@ -18,7 +19,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   final Xmlhandler xmlhandler = Xmlhandler();
   Map? customer;
   Map? company;
-  Map _fileContent = {};
+  List<dynamic> _fileContent = [];
   String? extractedData;
   String? name;
   final AuthService _auth = AuthService();
@@ -49,27 +50,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
       if(fileResult != null) {
         
-        Map parsedContent = await xmlhandler.getXml(fileResult.files.single.path!);
+        await xmlhandler.getXml(fileResult.files.single.path!);
 
-          setState(() {
-            _fileContent = parsedContent;
-            customer = _fileContent['cac:ReceiverParty']['cac:PartyTaxScheme'];
-            company = _fileContent['cac:SenderParty']['cac:PartyTaxScheme'];
-
-          });
-
-          print(_fileContent);
+        getXmlFiles();
 
       } else {
         setState(() {
-          _fileContent = {};
+          _fileContent = [];
         });
       }
 
     } catch(e) {
 
       setState(() {
-        _fileContent = {"response":"$e"};
+        _fileContent = ["No hay archivo seleccionado"];
       });
       
     }
@@ -79,6 +73,37 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   void logginOut() {
     _auth.logout(context);
+  }
+
+  @override
+  void initState() {
+    
+    super.initState();
+    getXmlFiles();
+  }
+
+  void getXmlFiles() async {
+    var xmlFiles = await xmlhandler.getXmls();
+    List myFiles = [];
+    for (var item in xmlFiles) {
+
+      XmlDocument xmlDocument = XmlDocument.parse(item['xml_text']);
+
+      Map parsedDoc = xmlhandler.xmlToMap(xmlDocument.rootElement);
+
+      Map newXml = {
+        '_id': item['_id'],
+        'customer': parsedDoc['cac:ReceiverParty']['cac:PartyTaxScheme'],
+        'company': parsedDoc['cac:SenderParty']['cac:PartyTaxScheme']
+      };
+          
+      myFiles.add(newXml);
+    }
+
+    setState(() {
+      _fileContent = myFiles;
+    });
+    
   }
 
 
@@ -130,38 +155,73 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
 
               Expanded(
-              child: SingleChildScrollView(
-                child: _fileContent.isNotEmpty
-                    ? SizedBox(
-                      width: MediaQuery.of(context).size.width,
-                      child: Card(
-                        shadowColor: Colors.grey,
-                        elevation: 2,
-                        child: Padding(
-                          padding: const EdgeInsets.all(10.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  const Text("Cliente: ", style: TextStyle(fontWeight: FontWeight.w500, color: Colors.blueAccent)),
-                                  Text("${customer?['cbc:RegistrationName']['text']}")
-                                ],
-                              ),
-                              Text("Cedula: ${customer?['cbc:CompanyID']['text']}"),
-                              Text("Empresa: ${company?['cbc:RegistrationName']['text']}", style: const TextStyle(fontWeight: FontWeight.w500, color: Colors.blueAccent)),
-                            ],
-                          ),
+              child: _fileContent.isNotEmpty
+                  ? ListView.builder(
+                    itemCount: _fileContent.length,
+                    itemBuilder: (context, index) {
+                      return Padding(
+                        padding: const EdgeInsets.all(5.0),
+                        child: ListTile(
+                          tileColor: const Color.fromARGB(240, 240, 240, 240),
+                          subtitle: Text(_fileContent[index]['customer']['cbc:CompanyID']['text']),
+                          title: Text(_fileContent[index]['customer']['cbc:RegistrationName']['text']),
+                          trailing: IconButton(onPressed: () {
+                            showDialog(context: context, builder: (_) => DeleteDialog(id:_fileContent[index]['_id'], func: getXmlFiles));
+                            
+                          }, icon: const Icon(Icons.delete)),
                         ),
-                      ),
-                    )
-                    : const Text("No hay archivo seleccionado"),
-              ),
+                      );
+                    },
+                  )
+                  : const Text("No hay archivo seleccionado"),
             ),
               
           ],
         ),
       )
+    );
+  }
+}
+
+
+//Creating the delete confirm dialog
+class DeleteDialog extends StatefulWidget {
+  final int id;
+  final Function func;
+  const DeleteDialog({super.key, required this.id, required this.func});
+
+  @override
+  State<DeleteDialog> createState() => _DeleteDialogState();
+}
+
+class _DeleteDialogState extends State<DeleteDialog> {
+
+  Xmlhandler xmlhandler = Xmlhandler();
+  
+
+  Future deleteFile(id) async {
+    try {
+      await xmlhandler.deleteXml(id);
+      print("Delete");
+
+    } catch(e) {
+      print(e);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text("Eliminar factura"),
+      content: const Text("Esta seguro que desea eliminar la factura?"),
+      actions: [
+        TextButton(onPressed: () {Navigator.pop(context);}, child: const Text("No")),
+        TextButton(onPressed: () {
+          deleteFile(widget.id);
+          widget.func();
+          Navigator.pop(context);
+        }, child: const Text("Si"))
+      ],
     );
   }
 }

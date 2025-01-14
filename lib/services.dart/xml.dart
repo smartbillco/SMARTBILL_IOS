@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:xml/xml.dart';
-
+import 'db.dart';
 
 class Xmlhandler {
 
@@ -18,8 +18,8 @@ class Xmlhandler {
       if (node is XmlElement) {
         // Recursive call for nested elements
         map[node.name.toString()] = xmlToMap(node);
-      } else if (node is XmlText && node.text.trim().isNotEmpty) {
-        map['text'] = node.text.trim();
+      } else if (node is XmlText && node.value.trim().isNotEmpty) {
+        map['text'] = node.value.trim();
       }
     }
 
@@ -35,6 +35,8 @@ class Xmlhandler {
 
       final xmlDocument = XmlDocument.parse(fileData);
 
+      insertXml(xmlDocument.toString());
+
       Map<String, dynamic> parsedMap = xmlToMap(xmlDocument.rootElement);
 
       return parsedMap;
@@ -44,6 +46,29 @@ class Xmlhandler {
       return {"response":"Couldn't upload XML file: $e"};
 
     }
+  }
+   Future insertXml(String xml) async {
+    DatabaseConnection databaseConnection = DatabaseConnection();
+    var db = await databaseConnection.openDb();
+    var result = await db.insert('xml_files', {'xml_text':xml});
+    databaseConnection.closeDB();
+    return result;
+
+  }
+
+  Future getXmls() async {
+    DatabaseConnection databaseConnection = DatabaseConnection();
+    var db = await databaseConnection.openDb();
+    var xmlFiles = await db.query('xml_files');
+    databaseConnection.closeDB();
+    return xmlFiles;
+  }
+  Future<void> deleteXml(int id) async {
+    DatabaseConnection databaseConnection = DatabaseConnection();
+    var db = await databaseConnection.openDb();
+    
+    await db.delete('xml_files', where: '_id = ?', whereArgs: [id]);
+    databaseConnection.closeDB();
   }
 
 }
