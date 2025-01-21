@@ -28,8 +28,6 @@ class _HomeScreenState extends State<HomeScreen> {
       
     });
 
-    print(_currentCountry);
-
     await getData();
   }
 
@@ -46,7 +44,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
     }
     
-    print(response['conversion_rates']['_currentCountry.currency']);
   }
 
   @override

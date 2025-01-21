@@ -18,8 +18,6 @@ class _WrapperState extends State<Wrapper> {
 
     User? user = Provider.of(context);
 
-    print("THIS IS THE USER: $user");
-
     if(user == null){
       return const HomeScreen();
     }

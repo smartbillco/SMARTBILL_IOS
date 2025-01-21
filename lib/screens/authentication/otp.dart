@@ -75,7 +75,7 @@ class _OtpScreenState extends State<OtpScreen> {
             ),
             //Enter OTP
             const Text(
-              "Ingresa tu codigo: ",
+              "Ingresa tu código: ",
               style: TextStyle(fontSize: 22),
             ),
             const SizedBox(

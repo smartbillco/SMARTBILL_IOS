@@ -61,7 +61,6 @@ class _AuthenticateScreenState extends State<AuthenticateScreen> {
     } else {
 
       await _auth.verifyPhone(context: context, phone: fullphone, codeSentCallback: (verificationId) {
-            print("IT ENTERED CODE SENT");
 
             setState(() {
               _verificationId = verificationId;
@@ -73,7 +72,6 @@ class _AuthenticateScreenState extends State<AuthenticateScreen> {
                     builder: (context) => OtpScreen(code: _verificationId)));
           },
           codeErrorCallback: (message) {
-            print("Error en entrar: $message");
             _showSnackbarcInvalidPhone();
 
             setState(() {

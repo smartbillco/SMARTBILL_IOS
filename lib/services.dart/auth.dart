@@ -31,8 +31,6 @@ class AuthService {
 
           Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) => const DashboardScreen()), (r) => false);
 
-          print("COMPLETED AUTO AUTENTICATION");
-
         },
         verificationFailed: (FirebaseException e) {
           codeErrorCallback(e.message ?? "Authentication failed: ${e.message}");
@@ -58,7 +56,6 @@ class AuthService {
       return userCredential.user;
 
     } catch (e) {
-      print("There was an error with the code");
       return null;
     }
 
@@ -74,8 +71,6 @@ class AuthService {
     try {
       await _auth.signOut();
       Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) => const HomeScreen()), (r) => false);
-
-      print("Logged out");
 
     } catch(e) {
       print("THERE WAS AN ERROR: $e");

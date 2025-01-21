@@ -19,7 +19,7 @@ class Trm {
       if(response.statusCode == 200) {
         return jsonDecode(response.body);
       } else {
-        return jsonDecode("There wasn an error");
+        return jsonDecode("There was an error");
       }
 
     } catch(e) {

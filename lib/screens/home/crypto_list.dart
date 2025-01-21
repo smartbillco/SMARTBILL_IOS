@@ -30,8 +30,6 @@ class _CryptoListState extends State<CryptoList> {
 
 
     }
-
-    print(topCryptos);
   }
 
 
@@ -42,7 +40,6 @@ class _CryptoListState extends State<CryptoList> {
     super.initState();
 
     getTopCryptos();
-
 
   }
 
