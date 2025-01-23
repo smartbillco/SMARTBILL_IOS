@@ -100,7 +100,7 @@ class _OtpScreenState extends State<OtpScreen> {
               ),
             ),
             const SizedBox(
-              height: 30,
+              height: 45,
             ),
             isLoading
                 ? const CircularProgressIndicator()

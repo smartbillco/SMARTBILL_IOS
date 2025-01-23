@@ -6,6 +6,8 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:xml/xml.dart';
 
+
+
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
 
@@ -125,7 +127,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ],
         ),
         body: Container(
-          margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 20),
+          margin: const EdgeInsets.symmetric(horizontal: 18, vertical: 24),
           child: Column(
             children: [
               Row(
@@ -183,7 +185,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             child: Material(
                               borderRadius: const BorderRadius.all(Radius.circular(10)),
                               elevation: 12,
-                              shadowColor: Colors.grey,
+                              shadowColor: const Color.fromARGB(255, 185, 185, 185),
                               child: ListTile(
                                 contentPadding:const EdgeInsets.fromLTRB(12, 5, 2, 5),
                                 leading: CircleAvatar(
@@ -193,9 +195,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   ),
                                   
                                   ),
-                                tileColor:const Color.fromARGB(244, 226, 226, 226),
+                                tileColor:const Color.fromARGB(244, 238, 238, 238),
                                 title: 
-                                  Text(_fileContent[index]['customer']['cbc:RegistrationName']['text'],
+                                  Text(_fileContent[index]['customer']['cbc:RegistrationName']['text'].toUpperCase(),
                                     style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 17, height: 1.3),
                                   ),
                                 subtitle: Column(
