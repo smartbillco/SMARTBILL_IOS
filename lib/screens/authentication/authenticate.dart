@@ -93,7 +93,7 @@ class _AuthenticateScreenState extends State<AuthenticateScreen> {
         title: const Text("Registrate"),
       ),
       body: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 70),
+        padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 60),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
@@ -142,12 +142,12 @@ class _AuthenticateScreenState extends State<AuthenticateScreen> {
               ],
             ),
 
-            const SizedBox(height: 30),
+            const SizedBox(height: 38),
 
             //Submit button
             isLoading ? const CircularProgressIndicator() : SizedBox(
               height: 50,
-              width: MediaQuery.of(context).size.width - 40,
+              width: MediaQuery.of(context).size.width - 80,
               child: ElevatedButton(
                   style: const ButtonStyle(
                       backgroundColor: WidgetStatePropertyAll(Color.fromARGB(255, 75, 78, 80))),
