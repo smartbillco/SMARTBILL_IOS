@@ -31,6 +31,7 @@ class Xmlhandler {
     try {
 
       File file = File(pathFile);
+      
       String fileData = await file.readAsString();
 
       final xmlDocument = XmlDocument.parse(fileData);

@@ -44,6 +44,8 @@ dependencies:
   url_launcher: ^6.3.1
   sqflite: ^2.4.1
   path: ^1.9.0
+  read_pdf_text: ^0.2.3
+  webview_flutter: ^4.10.0
   
 
   # The following adds the Cupertino Icons font to your application.

@@ -1,11 +1,10 @@
 import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:smartbill/screens/QRcode/qrcode_screen.dart';
 
 class QRScanner extends StatefulWidget {
-  final Function setResult;
-  const QRScanner({super.key, required this.setResult});
+  const QRScanner({super.key});
 
   @override
   State<QRScanner> createState() => _QRScannerState();
@@ -16,42 +15,58 @@ class _QRScannerState extends State<QRScanner> {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(children: [
-      MobileScanner(
-        controller: scannerController,
-        onDetect: (BarcodeCapture capture) async {
-          final List<Barcode> barcodes = capture.barcodes;
-
-          final qrResult = barcodes.first;
-
-          if (qrResult.rawValue != null) {
-            widget.setResult(qrResult.rawValue);
-
-            await scannerController
-                .stop()
-                .then((value) => scannerController.dispose())
-                .then((value) => Navigator.of(context).pop());
-          }
-          //for(final barcode in barcodes) {
-          //print(barcode.rawValue);
-          //}
-        },
-      ),
+    return Scaffold(
+      body: Stack(
+        children: [
+        MobileScanner(
+          controller: scannerController,
+          onDetect: (BarcodeCapture capture) async {
+            final List<Barcode> barcodes = capture.barcodes;
       
-      Positioned.fill(
-            child: Container(
-              decoration: ShapeDecoration(
-                shape: QrScannerOverlayShape(
-                  borderColor: Colors.blue,
-                  borderRadius: 10,
-                  borderLength: 20,
-                  borderWidth: 7,
-                  cutOutSize: 280,
+            final qrResult = barcodes.first;
+      
+            if (qrResult.rawValue != null) {
+      
+              //To do with code
+              await scannerController
+                  .stop()
+                  .then((value) => scannerController.dispose())
+                  .then((value) => Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => QrcodeScreen(qrResult: qrResult.rawValue,))));
+            } else {
+              print("THERE WAS AN ERROR");
+            }
+            //for(final barcode in barcodes) {
+            //print(barcode.rawValue);
+            //}
+          },
+        ),
+        Positioned.fill(
+              child: Container(
+                decoration: ShapeDecoration(
+                  shape: QrScannerOverlayShape(
+                    borderColor: Colors.blue,
+                    borderRadius: 10,
+                    borderLength: 20,
+                    borderWidth: 7,
+                    cutOutSize: 280,
+                  ),
+                ),
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.camera_alt, size: 100, color: Color.fromARGB(85, 255, 255, 255),),
+                      Transform.translate(
+                        offset: const Offset(0, 60),
+                        child: const Text("Escanea tu factura", style: TextStyle(color: Color.fromARGB(150, 255, 255, 255), fontSize: 18))
+                      )
+                    ])
                 ),
               ),
             ),
-          ),
-    ]);
+            
+      ]),
+    );
   }
 }
 
