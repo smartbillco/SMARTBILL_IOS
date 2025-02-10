@@ -79,7 +79,7 @@ class _DashboardContainerState extends State<DashboardContainer> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          DashboardText(),
+          const DashboardText(),
 
           //First row of navigation
           Row(

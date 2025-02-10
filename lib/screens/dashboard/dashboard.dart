@@ -97,7 +97,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   child: Column(
                     children: [
                       billsAmount > 0 ?
-                      Text(billsAmount.toString(), style: TextStyle(color: Colors.white, fontSize: 45),) :
+                      Text(billsAmount.toString(), style: const TextStyle(color: Colors.white, fontSize: 45),) :
                       const Text("0", style: TextStyle(color: Colors.white, fontSize: 45),),
                       const Text("Facturas", style: TextStyle(color: Colors.white, fontSize: 22),)
                       

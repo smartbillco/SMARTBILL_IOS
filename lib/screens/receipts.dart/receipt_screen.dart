@@ -100,7 +100,7 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
         title: const Text("Mis recibos"),
       ),
       body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 10, vertical: 30),
+        padding: EdgeInsets.symmetric(horizontal: 18, vertical: 30),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [

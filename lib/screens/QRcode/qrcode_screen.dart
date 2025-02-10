@@ -55,7 +55,7 @@ class _QrcodeScreenState extends State<QrcodeScreen> {
         title: const Text("Descargar factura"),
       ),
       body: Container(
-        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 40),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
         child: Column(
           children: [
             Expanded(child: WebViewWidget(controller: _controller))
