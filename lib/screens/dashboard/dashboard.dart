@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:smartbill/screens/dashboard/dashboard_widgets/dashboard_container.dart';
 import 'package:smartbill/services.dart/auth.dart';
+import 'package:smartbill/services.dart/pdf.dart';
 import 'package:smartbill/services.dart/xml.dart';
 
 
@@ -15,22 +16,35 @@ class DashboardScreen extends StatefulWidget {
 
 class _DashboardScreenState extends State<DashboardScreen> {
   final Xmlhandler xmlhandler = Xmlhandler();
+  final PdfHandler pdfHandler = PdfHandler();
   int billsAmount = 0;
   final AuthService _auth = AuthService();
 
   @override
   void initState() {
-    getNumberOfBills();
     super.initState();
+    getNumberOfBills();
+
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    getNumberOfBills();// Forces a rebuild when dependencies change
   }
 
   //Get bills amount
   Future<void> getNumberOfBills() async {
-    var result = await xmlhandler.getXmls();
+
 
     if(mounted) {
+      var resultPdf = await pdfHandler.getPdfs();
+      var resultXmls = await xmlhandler.getXmls();
+      
+      var total = await resultXmls.length + resultPdf.length;
+
       setState(() {
-      billsAmount = result.length;
+      billsAmount = total;
     });
     }
   

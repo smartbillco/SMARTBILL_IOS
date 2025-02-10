@@ -5,7 +5,6 @@ import 'package:smartbill/screens/QRcode/qr_scanner.dart';
 import 'package:smartbill/screens/receipts.dart/receipt_screen.dart';
 import 'package:smartbill/services.dart/pdf.dart';
 import 'package:smartbill/services.dart/xml.dart';
-import 'package:xml/xml.dart';
 
 class DashboardContainer extends StatefulWidget {
   const DashboardContainer({super.key});
@@ -19,7 +18,7 @@ class _DashboardContainerState extends State<DashboardContainer> {
   final PdfHandler pdfHandler = PdfHandler();
 
   //Open files and save and display a new XML
-  Future<void> _pickAndDisplayXml() async {
+  Future<void> _pickAndDisplayFile() async {
     
       FilePickerResult? fileResult = await FilePicker.platform.pickFiles(type: FileType.custom, allowedExtensions: ['xml', 'pdf']);
 
@@ -30,9 +29,12 @@ class _DashboardContainerState extends State<DashboardContainer> {
 
         if(fileName.endsWith('.pdf')) {
           
-          var pdfText = await pdfHandler.getPDFtext(filePath);
+          await pdfHandler.getPDFtext(filePath);
 
-          print(pdfText);
+          Navigator.of(context).push(
+            MaterialPageRoute(builder: (context) => const ReceiptScreen()));
+
+          
 
         } else if(fileName.endsWith('.xml')) {
           await xmlhandler.getXml(filePath);
@@ -83,7 +85,7 @@ class _DashboardContainerState extends State<DashboardContainer> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-             MenuButton(text: "Cargar factura", redirect: _pickAndDisplayXml, colors: const [Color.fromARGB(255, 126, 126, 126), Color.fromARGB(255, 31, 31, 31)]),
+             MenuButton(text: "Cargar factura", redirect: _pickAndDisplayFile, colors: const [Color.fromARGB(255, 126, 126, 126), Color.fromARGB(255, 31, 31, 31)]),
              MenuButton(text: "Escanear QR", redirect: redirectQRcode, colors: const [Color.fromARGB(255, 20, 82, 175), Color.fromARGB(255, 4, 34, 80)])
             ],
           ),

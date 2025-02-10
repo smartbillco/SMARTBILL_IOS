@@ -11,7 +11,8 @@ Future<void> main() async {
       apiKey: "AIzaSyDPK3kX-TfPeKY_qKAqoi81VRTiII7tPRc",
       appId: "1:1005746669910:android:720e57be651775f90e2ef7",
       messagingSenderId: "1005746669910",
-      projectId: "smartbill-flutter")
+      projectId: "smartbill-flutter"
+    )
   );
   
   runApp(StreamProvider.value(value: AuthService().user, initialData: null, child: const MyApp()));
