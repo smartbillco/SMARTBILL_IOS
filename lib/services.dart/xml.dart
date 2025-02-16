@@ -52,7 +52,6 @@ class Xmlhandler {
     DatabaseConnection databaseConnection = DatabaseConnection();
     var db = await databaseConnection.openDb();
     var result = await db.insert('xml_files', {'xml_text':xml});
-    databaseConnection.closeDB();
     return result;
 
   }
@@ -61,7 +60,6 @@ class Xmlhandler {
     DatabaseConnection databaseConnection = DatabaseConnection();
     var db = await databaseConnection.openDb();
     var xmlFiles = await db.query('xml_files');
-    databaseConnection.closeDB();
     return xmlFiles;
   }
   Future<void> deleteXml(int id) async {
@@ -69,7 +67,6 @@ class Xmlhandler {
     var db = await databaseConnection.openDb();
     
     await db.delete('xml_files', where: '_id = ?', whereArgs: [id]);
-    databaseConnection.closeDB();
   }
 
 }
