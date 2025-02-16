@@ -93,26 +93,26 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
           title: const Text("Mis recibos"),
         ),
         body: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 18, vertical: 30),
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 30),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Container(
-                padding: EdgeInsets.all(20),
+                padding: const EdgeInsets.all(20),
                 height: 120,
                 width: MediaQuery.of(context).size.width,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(15),
-                  gradient: LinearGradient(colors: [const Color.fromARGB(255, 68, 95, 109), Colors.black87])
+                  gradient: const LinearGradient(colors: [Color.fromARGB(255, 68, 95, 109), Colors.black87])
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text("Tu total hasta hoy", style: TextStyle(color: Colors.white, fontWeight: FontWeight.w200)),
-                    SizedBox(height: 5),
+                    const Text("Tu total hasta hoy", style: TextStyle(color: Colors.white, fontWeight: FontWeight.w200)),
+                    const SizedBox(height: 5),
                     Text("\$${total..toStringAsFixed(2)}",
-                    style: TextStyle(color: Colors.white,fontSize: 22, fontWeight: FontWeight.w400),),
+                    style: const TextStyle(color: Colors.white,fontSize: 22, fontWeight: FontWeight.w400),),
                   ],
                   )
                 ),
@@ -126,7 +126,7 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
               Expanded(
                 child: _fileContent.isNotEmpty
                     ? ListView.builder(
-                      padding: EdgeInsets.all(7),
+                      padding: const EdgeInsets.all(7),
                         itemCount: _fileContent.length,
                         itemBuilder: (context, index) {
                           return Padding(

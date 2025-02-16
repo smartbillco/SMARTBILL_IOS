@@ -22,7 +22,7 @@ class MyApp extends StatelessWidget {
       title: 'Smartbill',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.white),
-        useMaterial3: true,
+        useMaterial3: true, 
       ),
     );
   }
