@@ -56,7 +56,7 @@ class _CryptoListState extends State<CryptoList> {
                 final crypto = topCryptos[index];
                 return Card(
                   color: const Color.fromARGB(206, 255, 255, 255),
-                  margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                  margin: const EdgeInsets.symmetric(vertical: 7, horizontal: 20),
                   elevation: 5,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),

@@ -6,11 +6,12 @@ class DashboardText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text("Bienvenido a Smartbill!", style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold)),
-          SizedBox(height: 5),
-          Text("Tu App de factura electrónica.", style: TextStyle(fontSize: 19,)),
-          SizedBox(height: 40),
+          SizedBox(height: 8),
+          Text("Tu App de factura electrónica.", style: TextStyle(fontSize: 17,)),
+          SizedBox(height: 30),
         ],
     );
   }

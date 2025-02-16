@@ -80,7 +80,6 @@ class _DashboardContainerState extends State<DashboardContainer> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const DashboardText(),
-
           //First row of navigation
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -89,7 +88,7 @@ class _DashboardContainerState extends State<DashboardContainer> {
              MenuButton(text: "Escanear QR", redirect: redirectQRcode, colors: const [Color.fromARGB(255, 20, 82, 175), Color.fromARGB(255, 4, 34, 80)])
             ],
           ),
-          const SizedBox(height: 15),
+          const SizedBox(height: 18),
 
           //Second row of navigation
           Row(

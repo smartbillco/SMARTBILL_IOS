@@ -18,7 +18,7 @@ class _SplashScreenState extends State<SplashScreen> {
     return Scaffold(
         body: Center(
           child: AnimatedSplashScreen(
-            duration: 5000,
+            duration: 3000,
             nextScreen: const Wrapper(),
             splashTransition: SplashTransition.fadeTransition,
             splashIconSize: 180,
