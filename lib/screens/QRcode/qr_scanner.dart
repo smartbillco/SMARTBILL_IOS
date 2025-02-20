@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
@@ -12,6 +13,40 @@ class QRScanner extends StatefulWidget {
 
 class _QRScannerState extends State<QRScanner> {
   MobileScannerController scannerController = MobileScannerController();
+  Timer? _timeoutTimer;
+  bool _scanning = true;
+
+
+
+  void _showSnackbarError(String error) {
+    var snackbar = SnackBar(content: Text("Ha ocurrido un error: $error"));
+    ScaffoldMessenger.of(context).showSnackBar(snackbar);
+  }
+
+  void _showSnackbarTimeout() {
+    var snackbar = SnackBar(content: Text("Parece que la factura no es válida. Intenta con otra factura."), duration: Duration(seconds: 3),);
+    ScaffoldMessenger.of(context).showSnackBar(snackbar);
+  }
+
+
+  void _startTimer() {
+    _timeoutTimer = Timer(Duration(seconds: 15), () async {
+      if(_scanning) {
+        scannerController.stop();
+        _scanning = false;
+        _showSnackbarTimeout();
+        Navigator.of(context).pop();
+      }
+    });
+  }
+
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _startTimer();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,18 +61,25 @@ class _QRScannerState extends State<QRScanner> {
             final qrResult = barcodes.first;
       
             if (qrResult.rawValue != null) {
-      
+
+              _timeoutTimer?.cancel(); // Stop timeout if QR is scanned
+              _scanning = false;
               //To do with code
               await scannerController
                   .stop()
                   .then((value) => scannerController.dispose())
                   .then((value) => Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => QrcodeScreen(qrResult: qrResult.rawValue,))));
+                            
             } else {
-              print("THERE WAS AN ERROR");
+                  _showSnackbarError("ERROR");
+              
             }
             //for(final barcode in barcodes) {
             //print(barcode.rawValue);
             //}
+          },
+          onDetectError:(error, stackTrace) {
+            _showSnackbarError(error.toString());
           },
         ),
         Positioned.fill(
@@ -67,6 +109,13 @@ class _QRScannerState extends State<QRScanner> {
             
       ]),
     );
+  }
+
+  @override
+  void dispose() {
+    _timeoutTimer?.cancel();
+    scannerController.dispose();
+    super.dispose();
   }
 }
 

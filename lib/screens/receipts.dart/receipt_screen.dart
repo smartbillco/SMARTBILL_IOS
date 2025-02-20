@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:smartbill/services.dart/pdf.dart';
 import 'package:smartbill/services.dart/xml.dart';
 import 'package:xml/xml.dart';
@@ -12,15 +13,17 @@ class ReceiptScreen extends StatefulWidget {
 
 class _ReceiptScreenState extends State<ReceiptScreen> {
   final Xmlhandler xmlhandler = Xmlhandler();
+  final PdfHandler pdfHandler = PdfHandler();
   double total = 0;
   List<dynamic> _fileContent = [];
 
   //Extract values from pdfText
   dynamic extractValuesFromPdf(String value, List pdfLines) {
     for (var text in pdfLines) {
-      if (text.contains(value)) {
-        String range = text.substring(0, 16);
-        return range;
+      var textLowerCase = text.toLowerCase();
+      if (textLowerCase.startsWith(value)) {
+        var selectText = textLowerCase.toString().substring(4,);
+        return selectText;
       }
     }
   }
@@ -28,6 +31,7 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
   //Get all XML files from sqlite
   void getReceipts() async {
     var xmlFiles = await xmlhandler.getXmls();
+    var pdfFiles = await pdfHandler.getPdfs();
     
     double totalPaid = 0;
 
@@ -46,6 +50,7 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
 
       final xmlCData = XmlDocument.parse(cdataContent);
 
+
       Map parsedDoc = xmlhandler.xmlToMap(xmlDocument.rootElement);
 
       Map newXml = {
@@ -53,7 +58,7 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
         'customer': parsedDoc['cac:ReceiverParty']['cac:PartyTaxScheme'],
         'company': parsedDoc['cac:SenderParty']['cac:PartyTaxScheme'],
         'nit': parsedDoc['cac:SenderParty']['cac:PartyTaxScheme']
-            ['cbc:CompanyID'],
+            ['cbc:CompanyID']['text'],
         'price': xmlCData
             .findAllElements('cbc:TaxInclusiveAmount')
             .toList()
@@ -64,6 +69,20 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
       totalPaid += double.parse(newXml['price']);
 
       myFiles.add(newXml);
+    }
+
+    for(var item in pdfFiles) {
+
+      List pdfTextLines = item['pdf_text'].split('\n');
+
+      Map<String, dynamic> newPdf = {
+        '_id': item['_id'],
+        'nit': extractValuesFromPdf('nit', pdfTextLines),
+        'price': '0'
+      };
+
+      myFiles.add(newPdf);
+
     }
 
     if (mounted) {
@@ -112,8 +131,8 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
                   children: [
                     const Text("Tu total hasta hoy", style: TextStyle(color: Colors.white, fontWeight: FontWeight.w200)),
                     const SizedBox(height: 5),
-                    Text("\$${total..toStringAsFixed(2)}",
-                    style: const TextStyle(color: Colors.white,fontSize: 22, fontWeight: FontWeight.w400),),
+                    Text("\$${NumberFormat('#,##0', 'en_US').format(total).toString()}",
+                    style: const TextStyle(color: Colors.white,fontSize: 30, fontWeight: FontWeight.w600),),
                   ],
                   )
                 ),
@@ -144,51 +163,51 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
                                 leading: CircleAvatar(
                                   backgroundColor:
                                       const Color.fromARGB(255, 51, 51, 51),
-                                  child: Text(
-                                    _fileContent[index]['customer']
-                                            ['cbc:RegistrationName']['text'][0]
-                                        .toUpperCase(),
+                                  child: _fileContent[index]['customer'] != null ?
+                                  Text(_fileContent[index]['customer']['cbc:RegistrationName']['text'][0].toUpperCase(),
                                     style: const TextStyle(
                                         color: Colors.white,
                                         fontSize: 20,
                                         fontWeight: FontWeight.w400),
-                                  ),
+                                  )  : const Text('F', style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 21,
+                                        fontWeight: FontWeight.w500)),
                                 ),
                                 tileColor: const Color.fromARGB(244, 238, 238, 238),
-                                title: Text(
+                                title: _fileContent[index]['customer'] != null ?
+                                Text(
                                     _fileContent[index]['customer']
                                             ['cbc:RegistrationName']['text']
                                         .toUpperCase(),
                                     style: const TextStyle(
                                         fontWeight: FontWeight.w500,
                                         fontSize: 16,
-                                        height: 1.3)),
+                                        height: 1.3)) : Text('PDF', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),),
                                 subtitle: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       const SizedBox(height: 4),
+                                      _fileContent[index]['company'] != null ?
                                       Text(
                                           _fileContent[index]['company']
                                               ['cbc:RegistrationName']['text'],
-                                          style: const TextStyle(fontSize: 15)),
+                                          style: const TextStyle(fontSize: 15))
+                                      : Text('Factura electrónica', style: TextStyle(fontSize: 16)),
                                       const SizedBox(height: 4),
                                       Text(
-                                          "NIT: ${_fileContent[index]['nit']['text']}"),
-                                      Text("\$${_fileContent[index]['price']}"),
+                                          "NIT: ${_fileContent[index]['nit']}"),
+                                      Text("\$${NumberFormat('#,##0', 'en_US').format(double.parse(_fileContent[index]['price'])).toString()}"),
                                     ]),
                                 trailing: IconButton(
                                     onPressed: () {
                                       showDialog(
                                           context: context,
                                           builder: (_) => DeleteDialog(
-                                              id: _fileContent[index]['_id'],
+                                              item: _fileContent[index],
                                               func: getReceipts));
                                     },
-                                    icon: const Icon(
-                                      Icons.delete,
-                                      size: 25,
-                                      color: Color.fromARGB(255, 218, 106, 99),
-                                    )),
+                                    icon: const Icon(Icons.delete, size: 25, color: Color.fromARGB(255, 218, 106, 99))),
                               ),
                             ),
                           );
@@ -205,9 +224,9 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
 
 //Creating the delete confirm dialog
 class DeleteDialog extends StatefulWidget {
-  final int id;
+  final dynamic item;
   final Function func;
-  const DeleteDialog({super.key, required this.id, required this.func});
+  const DeleteDialog({super.key, required this.item, required this.func});
 
   @override
   State<DeleteDialog> createState() => _DeleteDialogState();
@@ -215,10 +234,15 @@ class DeleteDialog extends StatefulWidget {
 
 class _DeleteDialogState extends State<DeleteDialog> {
   Xmlhandler xmlhandler = Xmlhandler();
+  PdfHandler pdfHandler = PdfHandler();
 
-  Future deleteFile(id) async {
+  Future deleteFile(item) async {
     try {
-      await xmlhandler.deleteXml(id);
+      if(item['customer'] != null) {
+        await xmlhandler.deleteXml(item['_id']);
+      } else {
+        await pdfHandler.deletePdf(item['_id']);
+      }
     } catch (e) {
       print(e);
     }
@@ -240,7 +264,7 @@ class _DeleteDialogState extends State<DeleteDialog> {
             )),
         TextButton(
             onPressed: () {
-              deleteFile(widget.id);
+              deleteFile(widget.item);
               widget.func();
               Navigator.pop(context);
             },
