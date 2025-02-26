@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:xml/xml.dart';
-import 'db.dart';
+import '../db.dart';
 
 class Xmlhandler {
 

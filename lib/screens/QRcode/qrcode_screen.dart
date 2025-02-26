@@ -1,7 +1,7 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:http/http.dart' as http;
 
@@ -22,7 +22,6 @@ class _QrcodeScreenState extends State<QrcodeScreen> {
   void initState() {
     super.initState();
     print(widget.qrResult);
-    _requestPermissions();
   }
 
    // Request storage permissions
@@ -38,31 +37,6 @@ class _QrcodeScreenState extends State<QrcodeScreen> {
     super.dispose();
   }
 
-  Future<void> _downloadFile(String url) async {
-    try {
-    print("Fetching PDF from: $url");
-
-    // Request the file from the server
-    var response = await http.get(Uri.parse(url));
-
-    // Check if the response is OK
-    if (response.statusCode == 200) {
-      final directory = Directory("/storage/emulated/0/Download");
-      String fileName = "downloaded_bill";
-      String savePath = "${directory!.path}/$fileName";
-
-      // Write the file to storage
-      File file = File(savePath);
-      await file.writeAsBytes(response.bodyBytes);
-
-      print("PDF Saved to: $savePath");
-    } else {
-      print("Failed to download file. Status: ${response.statusCode}");
-    }
-  } catch (e) {
-    print("Download error: $e");
-  }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -86,11 +60,11 @@ class _QrcodeScreenState extends State<QrcodeScreen> {
                   webViewController = controller;
                 },
                 onDownloadStartRequest: (controller, request) async {
-                  String url = request.url.toString();
-                  print("Download Triggered: $url");
-
-                  await _downloadFile(url);
-},
+                  final url = request.url;
+                  
+                  _requestPermissions();
+                    
+                },
               ),
             )
           ],

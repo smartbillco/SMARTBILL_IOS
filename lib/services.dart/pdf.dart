@@ -4,6 +4,26 @@ import 'package:smartbill/services.dart/db.dart';
 
 class PdfHandler {
 
+  Map <String, dynamic> parsePdf(dynamic id, dynamic company_id, String text) {
+    final Map<String, dynamic> newPdf = {
+        '_id': id,
+        'id_bill': '',
+        'customer': 'PDF',
+        'company': '',
+        'company_id': company_id,
+        'price': '0',
+        'cufe': '',
+        'city': '',
+        'date': '',
+        'time': '',
+        'currency': 'PDF',
+        'text': text
+    };
+
+    return newPdf;
+
+  }
+
   Future getPdfs() async {
     DatabaseConnection databaseConnection = DatabaseConnection();
     var db = await databaseConnection.openDb();

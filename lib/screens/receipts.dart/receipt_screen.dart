@@ -5,7 +5,9 @@ import 'package:smartbill/screens/receipts.dart/receipt_widgets/delete_dialog.da
 import 'package:smartbill/screens/receipts.dart/receipt_widgets/searchbar.dart';
 import 'package:smartbill/screens/receipts.dart/receipt_widgets/total_sum.dart';
 import 'package:smartbill/services.dart/pdf.dart';
-import 'package:smartbill/services.dart/xml.dart';
+import 'package:smartbill/services.dart/xml/xml.dart';
+import 'package:smartbill/services.dart/xml/xml_colombia.dart';
+import 'package:smartbill/services.dart/xml/xml_peru.dart';
 import 'package:xml/xml.dart';
 
 class ReceiptScreen extends StatefulWidget {
@@ -16,9 +18,12 @@ class ReceiptScreen extends StatefulWidget {
 }
 
 class _ReceiptScreenState extends State<ReceiptScreen> {
+  final XmlColombia xmlColombia = XmlColombia();
+  final XmlPeru xmlPeru = XmlPeru();
   final Xmlhandler xmlhandler = Xmlhandler();
   final PdfHandler pdfHandler = PdfHandler();
-  double total = 0;
+  double totalColombia = 0;
+  double totalPeru = 0;
   List<dynamic> _fileContent = [];
 
   //Extract values from pdfText
@@ -36,67 +41,51 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
   void getReceipts() async {
     var xmlFiles = await xmlhandler.getXmls();
     var pdfFiles = await pdfHandler.getPdfs();
-    
-    double totalPaid = 0;
-
     List myFiles = [];
+    double totalPaidColombia = 0;
+    double totalPaidPeru = 0;
+
 
     for (var item in xmlFiles) {
+
       XmlDocument xmlDocument = XmlDocument.parse(item['xml_text']);
-
-      final cdataContent = xmlDocument
-          .findAllElements('cbc:Description')
-          .first
-          .children
-          .whereType<XmlCDATA>()
-          .map((cdata) => cdata.value)
-          .join();
-
-      final xmlCData = XmlDocument.parse(cdataContent);
-
 
       Map parsedDoc = xmlhandler.xmlToMap(xmlDocument.rootElement);
 
-      Map newXml = {
-        '_id': item['_id'],
-        'id_bill': parsedDoc['cbc:ID'],
-        'customer': parsedDoc['cac:ReceiverParty']['cac:PartyTaxScheme'],
-        'company': parsedDoc['cac:SenderParty']['cac:PartyTaxScheme'],
-        'nit': parsedDoc['cac:SenderParty']['cac:PartyTaxScheme']
-            ['cbc:CompanyID']['text'],
-        'price': xmlCData
-            .findAllElements('cbc:TaxInclusiveAmount')
-            .toList()
-            .last
-            .innerText,
-        'cufe': xmlCData
-            .findAllElements('cbc:UUID')
-            .toList()
-            .last
-            .innerText,
-        'city': xmlCData
-            .findAllElements('cbc:CityName')
-            .toList()
-            .last
-            .innerText,
-        'date': parsedDoc['cbc:IssueDate']['text'],
-        'time': parsedDoc['cbc:IssueTime']['text'],
-      };
+      if(xmlDocument.findAllElements('cac:Signature').isNotEmpty) {
+        //Peru logic
+        final Map newPeruvianXml = xmlPeru.parsePeruvianXml(item['_id'], parsedDoc, xmlDocument);
 
-      totalPaid += double.parse(newXml['price']);
+        totalPaidPeru += double.parse(newPeruvianXml['price']);
 
-      myFiles.add(newXml);
+        myFiles.add(newPeruvianXml);
+
+      } else {
+
+        //Colombian logic
+        final String cDataContent = xmlColombia.extractCData(xmlDocument);
+
+        final XmlDocument xmlCData = xmlColombia.parseCDataToXml(cDataContent);
+
+        final Map newColombianXml = xmlColombia.parseColombianXml(item['_id'], parsedDoc, xmlCData);
+
+        totalPaidColombia += double.parse(newColombianXml['price']);
+
+        myFiles.add(newColombianXml);
+
+        
+      }
+
+      
     }
 
     for(var item in pdfFiles) {
 
       List pdfTextLines = item['pdf_text'].split('\n');
 
-      Map<String, dynamic> newPdf = {
-        '_id': item['_id'],
-        'nit': extractValuesFromPdf('nit', pdfTextLines),
-        'price': '0'
-      };
+      final companyId = extractValuesFromPdf('nit', pdfTextLines);
+
+      final Map newPdf = pdfHandler.parsePdf(item['_id'], companyId, item['pdf_text']);
 
       myFiles.add(newPdf);
 
@@ -105,15 +94,14 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
     if (mounted) {
       setState(() {
         _fileContent = myFiles;
-        total = totalPaid;
+        totalColombia = totalPaidColombia;
+        totalPeru = totalPaidPeru;
       });
     }
   }
 
 
-  void redirectToBillDetail(Map receipt) {
-    Navigator.push(context, MaterialPageRoute(builder: (context) => BillDetailScreen(receipt: receipt)));
-  }
+  
 
   @override
   void initState() {
@@ -132,7 +120,7 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            TotalSumWidget(total: total),
+            TotalSumWidget(totalColombia: totalColombia, totalPeru: totalPeru),
             const SizedBox(height: 25),
             const SearchbarWidget(),
             const SizedBox(height: 15),
@@ -150,59 +138,7 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
                                 const BorderRadius.all(Radius.circular(10)),
                             elevation: 12,
                             shadowColor: const Color.fromARGB(255, 185, 185, 185),
-                            child: ListTile(
-                              onTap: () => redirectToBillDetail(_fileContent[index]),
-                              contentPadding:
-                                  const EdgeInsets.fromLTRB(10, 3, 2, 3),
-                              leading: CircleAvatar(
-                                backgroundColor:
-                                    const Color.fromARGB(255, 51, 51, 51),
-                                child: _fileContent[index]['customer'] != null ?
-                                Text(_fileContent[index]['customer']['cbc:RegistrationName']['text'][0].toUpperCase(),
-                                  style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.w400),
-                                )  : const Text('F', style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 21,
-                                      fontWeight: FontWeight.w500)),
-                              ),
-                              tileColor: const Color.fromARGB(244, 238, 238, 238),
-                              title: _fileContent[index]['customer'] != null ?
-                              Text(
-                                  _fileContent[index]['customer']
-                                          ['cbc:RegistrationName']['text']
-                                      .toUpperCase(),
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: 16,
-                                      height: 1.3)) : Text('PDF', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),),
-                              subtitle: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const SizedBox(height: 4),
-                                    _fileContent[index]['company'] != null ?
-                                    Text(
-                                        _fileContent[index]['company']
-                                            ['cbc:RegistrationName']['text'],
-                                        style: const TextStyle(fontSize: 15))
-                                    : const Text('Factura electrónica', style: TextStyle(fontSize: 16)),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                        "NIT: ${_fileContent[index]['nit']}"),
-                                    Text("\$${NumberFormat('#,##0', 'en_US').format(double.parse(_fileContent[index]['price'])).toString()}"),
-                                  ]),
-                              trailing: IconButton(
-                                  onPressed: () {
-                                    showDialog(
-                                        context: context,
-                                        builder: (_) => DeleteDialogWidget(
-                                            item: _fileContent[index],
-                                            func: getReceipts));
-                                  },
-                                  icon: const Icon(Icons.delete, size: 25, color: Color.fromARGB(255, 218, 106, 99))),
-                            ),
+                            child: ListReceipts(fileContent: _fileContent, index: index, getReceipts: getReceipts,)
                           ),
                         );
                       },
@@ -211,6 +147,64 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
             ),
         ]),
       ),
+    );
+  }
+}
+
+
+//Tiles for the receipts
+class ListReceipts extends StatefulWidget {
+  final dynamic fileContent;
+  final int index;
+  final Function getReceipts;
+  const ListReceipts({super.key, required this.fileContent, required this.index, required this.getReceipts});
+
+  @override
+  State<ListReceipts> createState() => _ListReceiptsState();
+}
+
+class _ListReceiptsState extends State<ListReceipts> {
+
+  void redirectToBillDetail(Map receipt) {
+    Navigator.push(context, MaterialPageRoute(builder: (context) => BillDetailScreen(receipt: receipt)));
+  }
+
+
+  @override
+  void initState() {
+    super.initState();
+    print(widget.fileContent);
+  } 
+
+  @override
+  Widget build(BuildContext context) {
+
+    return ListTile(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15), // Rounded corners
+      ),
+      onTap: () => redirectToBillDetail(widget.fileContent[widget.index]),
+      contentPadding: const EdgeInsets.fromLTRB(10, 5, 5, 3),
+      tileColor: const Color.fromARGB(244, 238, 238, 238),
+      title: Text(widget.fileContent[widget.index]['customer'], style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
+      subtitle: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(widget.fileContent[widget.index]['company'], style: const TextStyle(fontSize: 18)),
+          Text(widget.fileContent[widget.index]['company_id'], style: const TextStyle(fontSize: 16)),
+          Text('${widget.fileContent[widget.index]['currency']}: ${NumberFormat('#,##0', 'en_US').format(double.parse(widget.fileContent[widget.index]['price']))}', style: const TextStyle(fontSize: 16)),
+        ]
+      ),
+      trailing:  IconButton(
+         onPressed: () {
+           showDialog(
+             context: context,
+             builder: (_) => DeleteDialogWidget(
+              item: widget.fileContent[widget.index],
+              func: widget.getReceipts));
+          },
+          icon: const Icon(Icons.delete, size: 25, color: Colors.redAccent)),
+
     );
   }
 }

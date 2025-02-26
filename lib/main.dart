@@ -7,7 +7,6 @@ import 'package:smartbill/services.dart/auth.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  
   runApp(StreamProvider.value(value: AuthService().user, initialData: null, child: const MyApp()));
 }
 
