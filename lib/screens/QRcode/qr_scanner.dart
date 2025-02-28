@@ -68,7 +68,10 @@ class _QRScannerState extends State<QRScanner> {
               await scannerController
                   .stop()
                   .then((value) => scannerController.dispose())
-                  .then((value) => Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => QrcodeScreen(qrResult: qrResult.rawValue,))));
+                  .then((value) {
+                    print("PRINTING!!!!!! ${qrResult.rawValue}");
+                    Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => QrcodeScreen(qrResult: qrResult.rawValue,)));
+                  });
                             
             } else {
                   _showSnackbarError("ERROR");

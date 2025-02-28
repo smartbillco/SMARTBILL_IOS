@@ -27,14 +27,17 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
   List<dynamic> _fileContent = [];
 
   //Extract values from pdfText
-  dynamic extractValuesFromPdf(String value, List pdfLines) {
-    for (var text in pdfLines) {
-      var textLowerCase = text.toLowerCase();
-      if (textLowerCase.startsWith(value)) {
-        var selectText = textLowerCase.toString().substring(4,);
-        return selectText;
+  dynamic extractValuesFromPdf(String value, List<String>pdfLines) {
+
+    for (String text in pdfLines) {
+      
+      if(text.toLowerCase().contains(value.toLowerCase())) {
+        return text;
       }
+      
     }
+
+    return "NIT de la empresa";
   }
 
   //Get all XML files from sqlite
@@ -81,7 +84,7 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
 
     for(var item in pdfFiles) {
 
-      List pdfTextLines = item['pdf_text'].split('\n');
+      List<String> pdfTextLines = item['pdf_text'].split('\n');
 
       final companyId = extractValuesFromPdf('nit', pdfTextLines);
 
@@ -173,7 +176,6 @@ class _ListReceiptsState extends State<ListReceipts> {
   @override
   void initState() {
     super.initState();
-    print(widget.fileContent);
   } 
 
   @override

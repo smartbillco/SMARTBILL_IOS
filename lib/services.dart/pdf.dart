@@ -4,6 +4,26 @@ import 'package:smartbill/services.dart/db.dart';
 
 class PdfHandler {
 
+
+
+  //Read QR bill from Peru
+  Map<String, dynamic> parseQrPeru(String qrResult) {
+    List qrList = qrResult.split(' | ');
+    List keys = ['ruc_company', 'receipt_id', 'code_start', 'code_end', 'igv', 'amount', 'date', 'percentage', 'ruc_customer', 'summery'];
+
+    Map<String, dynamic> qrPdf = {};
+
+    for (var i = 0; i < qrList.length; i++) {
+      qrPdf[keys[i]] = qrList[i];
+    }
+
+    print(qrPdf);
+
+    return qrPdf;
+  }
+
+
+  //Parse info into pdf
   Map <String, dynamic> parsePdf(dynamic id, dynamic company_id, String text) {
     final Map<String, dynamic> newPdf = {
         '_id': id,

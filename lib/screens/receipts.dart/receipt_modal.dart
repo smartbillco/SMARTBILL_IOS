@@ -13,11 +13,35 @@ class BillDetailScreen extends StatefulWidget {
 
 class _BillDetailScreenState extends State<BillDetailScreen> {
 
+  List textPdf = [];
+
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    print(widget.receipt);
+    formatPdfContent();
+  }
+
+  void formatPdfContent() {
+    if(widget.receipt.containsKey('text')) {
+      List pdfTextLines = widget.receipt['text'].split('\n');
+
+      if(pdfTextLines.length > 14) {
+        
+      }
+
+
+      for (var i = 0; i < pdfTextLines.length; i++) {
+        if(pdfTextLines[i].contains(':')) {
+          textPdf.add(pdfTextLines[i]);
+        } else {
+          var fullLine = pdfTextLines[i] + ':';
+          textPdf.add(fullLine);
+        }
+      }
+      print("Printing: $textPdf");
+
+    }
+    
   }
 
   void returnToReceipts() {
@@ -41,7 +65,28 @@ class _BillDetailScreenState extends State<BillDetailScreen> {
         Container(
           child: Column(
             children: [
-              Text.rich(_buildTextSpan(widget.receipt['text']),),
+              const SizedBox(height:30),
+              const Icon(Icons.check, size: 60, color: Colors.green,),
+              const SizedBox(height:50),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 5, vertical: 30),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: textPdf.map((item) {
+                  List<String> parts = item.split(':'); // Split key and value
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween, // Space left & right
+                    children: [
+                      Container(width: MediaQuery.of(context).size.width * 0.35,
+                      child: parts[0].length > 15 ? Text(parts[0].substring(0,15)) : Text(parts[0],
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16))), 
+                      SizedBox(height: 30),// Key (Left)
+                      Container(width: MediaQuery.of(context).size.width * 0.5, child: Text(parts[1], style: TextStyle(fontSize: 14))), // Value (Right)
+                ],
+                            );
+                          }).toList(),
+                ),
+              ),
               Center(
                     child: ElevatedButton(
                       style: const ButtonStyle(
@@ -59,8 +104,8 @@ class _BillDetailScreenState extends State<BillDetailScreen> {
             ]
              
           ),
-        )
-        : Container(
+        ) :
+        Container(
           padding: const EdgeInsets.symmetric(vertical: 50, horizontal: 45),
           decoration: const BoxDecoration(
             color: Colors.white,
@@ -143,20 +188,3 @@ class ReceiptRows extends StatelessWidget {
     );
   }
 }
-
-TextSpan _buildTextSpan(String input) {
-    List<TextSpan> spans = [];
-    
-    for (int i = 0; i < input.length; i++) {
-      String char = input[i];
-
-      spans.add(TextSpan(
-        text: char,
-        style: char.contains(RegExp(r'[A-Z]'))
-            ? const TextStyle(fontWeight: FontWeight.bold, fontSize: 17)
-            : const TextStyle(fontWeight: FontWeight.normal, fontSize: 15),
-      ));
-    }
-
-    return TextSpan(children: spans);
-  }
