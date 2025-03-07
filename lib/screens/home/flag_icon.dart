@@ -15,6 +15,7 @@ class _FlagIconState extends State<FlagIcon> {
 
   Country colombia = Country(id: 1, flag: "assets/images/colombian_flag.png", name: "Colombia", currency: "COP");
   Country peru = Country(id: 2, flag: "assets/images/peruvian_flag.png", name: "Peru", currency: "PEN");
+  Country eu = Country(id: 3, flag: "assets/images/european_union_flag.png", name: "UE", currency: "EUR");
   
   Country _currentCountry = Country(id: 1, flag: "assets/images/colombian_flag.png", name: "Colombia",  currency: "COP");
 
@@ -63,6 +64,18 @@ class _FlagIconState extends State<FlagIcon> {
                     Image(image: AssetImage(peru.flag), width: 40, height: 40,),
                     const SizedBox(width: 20,),
                     Text(peru.name)
+                  ]
+                )
+              ),
+              PopupMenuItem(
+                onTap: () {
+                  changeFlag(eu);
+                },
+                child: Row(
+                  children: <Widget>[
+                    Image(image: AssetImage(eu.flag), width: 40, height: 40,),
+                    const SizedBox(width: 20,),
+                    Text(eu.name)
                   ]
                 )
               )

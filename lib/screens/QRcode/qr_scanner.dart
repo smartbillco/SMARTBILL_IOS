@@ -24,7 +24,7 @@ class _QRScannerState extends State<QRScanner> {
   }
 
   void _showSnackbarTimeout() {
-    var snackbar = SnackBar(content: Text("Parece que la factura no es válida. Intenta con otra factura."), duration: Duration(seconds: 3),);
+    var snackbar = SnackBar(content: Text("Su factura no pudo ser leida. Intenta con otra factura."), duration: Duration(seconds: 3),);
     ScaffoldMessenger.of(context).showSnackBar(snackbar);
   }
 

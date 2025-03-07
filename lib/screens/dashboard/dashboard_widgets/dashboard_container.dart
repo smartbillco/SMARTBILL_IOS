@@ -1,5 +1,6 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:smartbill/screens/PDFList/pdf_list.dart';
 import 'package:smartbill/screens/dashboard/dashboard_widgets/dashboard_text.dart';
 import 'package:smartbill/screens/QRcode/qr_scanner.dart';
 import 'package:smartbill/screens/receipts.dart/receipt_screen.dart';
@@ -63,6 +64,11 @@ class _DashboardContainerState extends State<DashboardContainer> {
     Navigator.of(context).push(MaterialPageRoute(builder: (context) => const QRScanner()));
   }
 
+  //Redirect to QRcode
+  void redirectPdfFiles() {
+    Navigator.of(context).push(MaterialPageRoute(builder: (context) => const PDFListScreen()));
+  }
+
 
   //Snackbar for receipt cancel
   //Cancelled picking a xml file
@@ -95,7 +101,7 @@ class _DashboardContainerState extends State<DashboardContainer> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
              MenuButton(text: "Mis facturas", redirect: redirectReceiptList, colors: const [Color.fromARGB(255, 238, 218, 42), Color.fromARGB(255, 175, 137, 11)]),
-             MenuButton(text: "Consultas", redirect: () {}, colors: const [Color.fromARGB(255, 47, 180, 51), Color.fromARGB(255, 16, 78, 20)] )
+             MenuButton(text: "PDFs DIAN", redirect: redirectPdfFiles, colors: const [Color.fromARGB(255, 47, 180, 51), Color.fromARGB(255, 16, 78, 20)] )
             ],
           )
         ],

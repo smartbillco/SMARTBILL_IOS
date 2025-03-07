@@ -4,7 +4,7 @@ import 'package:smartbill/screens/authentication/otp.dart';
 import 'package:smartbill/screens/authentication/phone_image.dart';
 import 'package:smartbill/services.dart/auth.dart';
 
-const List countryCode = ["+57", "+51"];
+const List countryCode = ["+57", "+51", "+33", "+1", "+56", "+55", "+34", "+507"];
 
 class AuthenticateScreen extends StatefulWidget {
   const AuthenticateScreen({super.key});

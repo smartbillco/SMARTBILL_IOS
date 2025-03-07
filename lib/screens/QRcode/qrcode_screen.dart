@@ -1,8 +1,10 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
-
+import 'package:flutter_downloader/flutter_downloader.dart';
+import 'package:smartbill/screens/PDFList/pdf_list.dart';
 import 'package:smartbill/services.dart/pdf.dart';
 
 
@@ -25,16 +27,7 @@ class _QrcodeScreenState extends State<QrcodeScreen> {
   void initState() {
     super.initState();
     isValidUri();
-    _requestPermissions();
 
-  }
-
-  // Request storage permissions
-  Future<void> _requestPermissions() async {
-    if (Platform.isAndroid) {
-      await Permission.storage.request();
-      await Permission.manageExternalStorage.request(); // For Android 13+
-    }
   }
 
 
@@ -49,6 +42,20 @@ class _QrcodeScreenState extends State<QrcodeScreen> {
   void dispose() {
     super.dispose();
   }
+
+  void showSnackbar(String content) {
+    var snackbar = SnackBar(content: Text(content));
+
+    ScaffoldMessenger.of(context).showSnackBar(snackbar);
+  }
+
+  //Navigator is changing screens before the file has been created
+  Future<void> delayNagivation() async {
+    await Future.delayed(Duration(seconds: 5));
+    print("Changing screens");
+
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -73,8 +80,34 @@ class _QrcodeScreenState extends State<QrcodeScreen> {
                     webViewController = controller;
                   },
                   onDownloadStartRequest: (controller, request) async {
-      
-                      
+
+                    Directory? saveDirectory = await getDownloadsDirectory();
+
+                    String filepath = saveDirectory!.path;
+
+                    final String filename = '${request.url.toString().split('=').last}.pdf';
+
+                    try {
+                        final taskId = FlutterDownloader.enqueue(
+                        url: request.url.toString(),
+                        savedDir: filepath,
+                        fileName: filename,
+                        showNotification: true,
+                        openFileFromNotification: true,
+                      );
+
+                    
+                      showSnackbar("Archivo descargado. Estamos redireccionando.");
+
+                      await delayNagivation();
+                        
+                      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const PDFListScreen()));
+
+                    } catch(e) {
+                      print("ERROR! $e");
+                      showSnackbar("Ha ocurrido un problema con el PDF");
+
+                    }
                   },
                 ),
               ): 

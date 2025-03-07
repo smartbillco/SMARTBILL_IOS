@@ -6,5 +6,4 @@ class Country {
 
   Country({required this.id, required this.flag, required this.name, required this.currency});
 
-
 }

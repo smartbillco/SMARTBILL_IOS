@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:smartbill/screens/home/app_bar_widgets.dart';
 import 'package:smartbill/screens/home/crypto_list.dart';
 import 'package:smartbill/screens/home/flag_icon.dart';
-import 'package:smartbill/screens/models/country.dart';
 import 'package:smartbill/services.dart/trm.dart';
+import 'package:smartbill/screens/models/country.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});

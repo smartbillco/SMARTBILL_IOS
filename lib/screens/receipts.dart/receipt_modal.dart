@@ -25,12 +25,7 @@ class _BillDetailScreenState extends State<BillDetailScreen> {
     if(widget.receipt.containsKey('text')) {
       List pdfTextLines = widget.receipt['text'].split('\n');
 
-      if(pdfTextLines.length > 14) {
-        
-      }
-
-
-      for (var i = 0; i < pdfTextLines.length; i++) {
+      for (var i = 0; i < 12; i++) {
         if(pdfTextLines[i].contains(':')) {
           textPdf.add(pdfTextLines[i]);
         } else {

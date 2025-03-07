@@ -3,8 +3,6 @@ import 'package:smartbill/screens/dashboard/dashboard_widgets/dashboard_containe
 import 'package:smartbill/services.dart/auth.dart';
 import 'package:smartbill/services.dart/pdf.dart';
 import 'package:smartbill/services.dart/xml/xml.dart';
-import 'package:intl/intl.dart';
-
 
 
 class DashboardScreen extends StatefulWidget {
@@ -26,18 +24,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
     getNumberOfBills();
 
   }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    getNumberOfBills();// Forces a rebuild when dependencies change
-  }
-
+  
   //Get bills amount
   Future<void> getNumberOfBills() async {
-
-    print("UPdating");
-
 
     if(mounted) {
       var resultXmls = await xmlhandler.getXmls();
@@ -49,7 +38,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
           billsAmount = total;
         });
       }
-
       
     }
   
