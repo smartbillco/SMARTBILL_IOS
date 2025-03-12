@@ -4,8 +4,6 @@ import 'package:smartbill/services.dart/db.dart';
 
 class PdfHandler {
 
-
-
   //Read QR bill from Peru
   Map<String, dynamic> parseQrPeru(String qrResult) {
     List qrList = qrResult.split(' | ');
@@ -24,13 +22,13 @@ class PdfHandler {
 
 
   //Parse info into pdf
-  Map <String, dynamic> parsePdf(dynamic id, dynamic company_id, String text) {
+  Map <String, dynamic> parsePdf(dynamic id, dynamic companyId, String text) {
     final Map<String, dynamic> newPdf = {
         '_id': id,
         'id_bill': '',
         'customer': 'PDF',
         'company': '',
-        'company_id': company_id,
+        'company_id': companyId,
         'price': '0',
         'cufe': '',
         'city': '',
@@ -75,5 +73,19 @@ class PdfHandler {
     
     await db.delete('pdf_files', where: '_id = ?', whereArgs: [id]);
   }
+
+
+  Map<String, dynamic> parseDIANpdf(String bill_number, String company, String date, String total) {
+    Map<String, dynamic> dianPdf = {
+      'bill_number': bill_number,
+      'company': company,
+      'date': date,
+      'total': total
+    };
+
+    return dianPdf;
+
+  }
+
 
 }

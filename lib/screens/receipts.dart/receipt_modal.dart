@@ -64,7 +64,7 @@ class _BillDetailScreenState extends State<BillDetailScreen> {
               const Icon(Icons.check, size: 60, color: Colors.green,),
               const SizedBox(height:50),
               Padding(
-                padding: EdgeInsets.symmetric(horizontal: 5, vertical: 30),
+                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 30),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: textPdf.map((item) {
@@ -72,11 +72,11 @@ class _BillDetailScreenState extends State<BillDetailScreen> {
                   return Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween, // Space left & right
                     children: [
-                      Container(width: MediaQuery.of(context).size.width * 0.35,
+                      SizedBox(width: MediaQuery.of(context).size.width * 0.35,
                       child: parts[0].length > 15 ? Text(parts[0].substring(0,15)) : Text(parts[0],
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16))), 
-                      SizedBox(height: 30),// Key (Left)
-                      Container(width: MediaQuery.of(context).size.width * 0.5, child: Text(parts[1], style: TextStyle(fontSize: 14))), // Value (Right)
+                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16))), 
+                      const SizedBox(height: 30),// Key (Left)
+                      SizedBox(width: MediaQuery.of(context).size.width * 0.5, child: Text(parts[1], style: const TextStyle(fontSize: 14))), // Value (Right)
                 ],
                             );
                           }).toList(),
@@ -110,8 +110,8 @@ class _BillDetailScreenState extends State<BillDetailScreen> {
             children: [
               const Icon(Icons.check, size: 60, color: Colors.green,),
               const SizedBox(height: 20,),
-              Text("Factura: ${widget.receipt['id_bill']}", style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),),
-              Text("ID Empresa: ${widget.receipt['company_id']}", style: TextStyle(fontSize: 17)),
+              Text("Factura: ${widget.receipt['id_bill']}", style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),),
+              Text("ID Empresa: ${widget.receipt['company_id']}", style: const TextStyle(fontSize: 17)),
               const SizedBox(height: 20,),
               const Divider(
                   color: Colors.grey, // Line color
@@ -177,7 +177,7 @@ class ReceiptRows extends StatelessWidget {
             Flexible(child: Text(value, softWrap: true, )),
           ],
         ),
-        SizedBox(height: 7,)
+        const SizedBox(height: 7,)
       ]
        
     );

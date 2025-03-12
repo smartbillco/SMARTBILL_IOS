@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:smartbill/screens/PDFList/pdf_list.dart';
 import 'package:smartbill/services.dart/pdf.dart';
@@ -51,7 +50,7 @@ class _QrcodeScreenState extends State<QrcodeScreen> {
 
   //Navigator is changing screens before the file has been created
   Future<void> delayNagivation() async {
-    await Future.delayed(Duration(seconds: 5));
+    await Future.delayed(const Duration(seconds: 5));
     print("Changing screens");
 
   }
@@ -64,7 +63,7 @@ class _QrcodeScreenState extends State<QrcodeScreen> {
         title: const Text("Descargar factura"),
       ),
       body: Container(
-        padding: EdgeInsets.all(25),
+        padding: const EdgeInsets.all(25),
         child: Column(
           children: [
               isUri ?  
@@ -75,7 +74,7 @@ class _QrcodeScreenState extends State<QrcodeScreen> {
                     allowFileAccess: true,
                     allowContentAccess: true,
                   ),
-                  initialUrlRequest: URLRequest(url: WebUri.uri(Uri.parse(widget.qrResult!))),
+                  initialUrlRequest: URLRequest(url: WebUri.uri(Uri.parse('https://catalogo-vpfe.dian.gov.co/User/SearchDocument'))),
                   onWebViewCreated: (controller) {
                     webViewController = controller;
                   },

@@ -24,13 +24,13 @@ class _QRScannerState extends State<QRScanner> {
   }
 
   void _showSnackbarTimeout() {
-    var snackbar = SnackBar(content: Text("Su factura no pudo ser leida. Intenta con otra factura."), duration: Duration(seconds: 3),);
+    var snackbar = const SnackBar(content: Text("Su factura no pudo ser leida. Intenta con otra factura."), duration: Duration(seconds: 3),);
     ScaffoldMessenger.of(context).showSnackBar(snackbar);
   }
 
 
   void _startTimer() {
-    _timeoutTimer = Timer(Duration(seconds: 15), () async {
+    _timeoutTimer = Timer(const Duration(seconds: 15), () async {
       if(_scanning) {
         scannerController.stop();
         _scanning = false;
