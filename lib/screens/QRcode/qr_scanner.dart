@@ -30,12 +30,15 @@ class _QRScannerState extends State<QRScanner> {
 
 
   void _startTimer() {
+    
     _timeoutTimer = Timer(const Duration(seconds: 15), () async {
       if(_scanning) {
         scannerController.stop();
         _scanning = false;
         _showSnackbarTimeout();
         Navigator.of(context).pop();
+
+        Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => const QrcodeScreen(qrResult: 'https://www.youtube.com',)));
       }
     });
   }
@@ -46,7 +49,10 @@ class _QRScannerState extends State<QRScanner> {
     // TODO: implement initState
     super.initState();
     _startTimer();
+    
   }
+
+  @override
 
   @override
   Widget build(BuildContext context) {

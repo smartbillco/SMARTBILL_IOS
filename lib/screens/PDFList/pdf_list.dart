@@ -20,12 +20,12 @@ class _PDFListScreenState extends State<PDFListScreen> {
   List<dynamic> pdfParsed= [];
   double total = 0;
 
+  late Future<List<File>> _pdfFilesFuture;
 
   @override
   void initState() {
     super.initState();
-    _loadDocuments();
-
+    _pdfFilesFuture = _getDownloadedPdfs();
   }
 
   //Extract values from pdfText
@@ -39,149 +39,76 @@ class _PDFListScreenState extends State<PDFListScreen> {
       
     }
 
-    return "Not found";
+    return "NIT de la empresa";
   }
 
-  Future<void> _loadDocuments() async {
+  Future<List<File>> _getDownloadedPdfs() async {
+    Directory? appDir = await getExternalStorageDirectory();
+    Directory invoicesDir = Directory("${appDir!.path}/invoices");
 
-    directory = await getDownloadsDirectory();
+    if (!invoicesDir.existsSync()) return [];
 
-    if(!directory!.existsSync()) {
-      print("No directory found");
-      return;
-    }
-
-    List<FileSystemEntity> files = directory!.listSync();
-    List<File> pdfs = files
+    return invoicesDir
+        .listSync()
         .where((file) => file.path.endsWith('.pdf'))
         .map((file) => File(file.path))
         .toList();
-
-    setState(() {
-      pdfFiles = pdfs;
-    });
-
-    List pdfsDian = [];
-
-    for (var file in pdfFiles) {
-      String text;
-     
-      text = await ReadPdfText.getPDFtext(file.path);
-
-      List<String> pdfSplit = text.split('\n');
-
-      String bill_number = extractValuesFromPdf("Número de Factura", pdfSplit);
-      String company = extractValuesFromPdf("Razón Social", pdfSplit);
-      String date = extractValuesFromPdf("Fecha de Emisión", pdfSplit);
-
-      Map parsedDian = pdfHandler.parseDIANpdf(bill_number, company, date, '0');
-
-      pdfsDian.add(parsedDian);
-      
-    }
-
-    setState(() {
-      pdfParsed = pdfsDian;
-    });
-
-    print(pdfParsed);
-    
   }
 
 
   Future<PdfPageImage?> _generateThumbnail(File pdfFile) async {
     final document = await PdfDocument.openFile(pdfFile.path);
-    final page = await document.getPage(1); // Load the first page
+    final page = await document.getPage(1);
+
     final image = await page.render(
       width: page.width,
       height: page.height,
       format: PdfPageImageFormat.png,
     );
+
     await page.close();
     return image;
   }
 
-
-  void _deleteFile(File file) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text("Eliminar PDF?"),
-        content: const Text("Esta seguro de que desea eliminar el PDF?"),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text("Cancelar"),
-          ),
-          TextButton(
-            onPressed: () async {
-              if (await file.exists()) {
-                await file.delete();
-                setState(() {
-                  pdfFiles.remove(file);
-                });
-              }
-              Navigator.pop(context);
-            },
-            child: const Text("Eliminar", style: TextStyle(color: Colors.red)),
-          ),
-        ],
-      ),
-    );
-  }
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("PDFs"),
-      ),
-      body: Column(
-        children: [
-          SizedBox(
-            width: MediaQuery.of(context).size.width - 80,
-            height: 80,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text("Total: $total"),
-                Text("Facturas: 0")
+      appBar: AppBar(title: const Text("Invoices")),
+      body: FutureBuilder<List<File>>(
+        future: _pdfFilesFuture,
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
+          List<File> pdfFiles = snapshot.data!;
 
-              ],
-            ),
-          ),
-          Expanded( // ✅ Wrap ListView.builder inside Expanded
-            child: Container(
-              padding: const EdgeInsets.all(20),
-              child: Center(
-                child: pdfFiles.isEmpty
-                    ? const Text("No tienes PDFs todavía. Escanea un código QR para comenzar.")
-                    : ListView.builder(
-                        padding: EdgeInsets.all(8),
-                        itemCount: pdfFiles.length,
-                        itemBuilder: (context, index) {
-                          return FutureBuilder<PdfPageImage?>(
-                            future: _generateThumbnail(pdfFiles[index]),
-                            builder: (context, snapshot) {
-                              return ListTile(
-                                leading: snapshot.hasData
-                                    ? Image.memory(snapshot.data!.bytes, width: 50, height: 50, fit: BoxFit.cover)
-                                    : SizedBox(width: 50, height: 50, child: CircularProgressIndicator()),
-                                title: Text(pdfFiles[index].path.split('/').last),
-                                onTap: () async {
-                                  await OpenFilex.open(pdfFiles[index].path);
-                                },
-                              );
-                            },
-                          );
-                        },
-                      ),
-              ),
-            ),
-          ),
-        ],
+          if (pdfFiles.isEmpty) return const Center(child: Text("No PDFs found"));
+
+          return ListView.builder(
+            padding: const EdgeInsets.all(8),
+            itemCount: pdfFiles.length,
+            itemBuilder: (context, index) {
+              File pdfFile = pdfFiles[index];
+
+              return FutureBuilder<PdfPageImage?>(
+                future: _generateThumbnail(pdfFile),
+                builder: (context, snapshot) {
+                  return ListTile(
+                    leading: snapshot.hasData
+                        ? Image.memory(snapshot.data!.bytes, width: 50, height: 50, fit: BoxFit.cover)
+                        : const SizedBox(width: 50, height: 50, child: CircularProgressIndicator()),
+                    title: Text(pdfFile.path.split('/').last),
+                    onTap: () async {
+                      await OpenFilex.open(pdfFile.path);
+                    },
+                  );
+                },
+              );
+            },
+          );
+        },
       ),
     );
   }
+
+
 }
+

@@ -80,20 +80,22 @@ class _QrcodeScreenState extends State<QrcodeScreen> {
                   },
                   onDownloadStartRequest: (controller, request) async {
 
-                    Directory? saveDirectory = await getDownloadsDirectory();
+                    final dir = await getExternalStorageDirectory(); // Returns app's external storage
+                    final path = "${dir!.path}/invoices";
+                    await Directory(path).create(recursive: true);
 
-                    String filepath = saveDirectory!.path;
-
-                    final String filename = '${request.url.toString().split('=').last}.pdf';
+                    String fileName = "invoice_${DateTime.now().millisecondsSinceEpoch}.pdf";
 
                     try {
                         final taskId = FlutterDownloader.enqueue(
                         url: request.url.toString(),
-                        savedDir: filepath,
-                        fileName: filename,
+                        savedDir: path,
+                        fileName: fileName,
                         showNotification: true,
                         openFileFromNotification: true,
                       );
+
+                      print(taskId);
 
                     
                       showSnackbar("Archivo descargado. Estamos redireccionando.");
