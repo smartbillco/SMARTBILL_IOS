@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdfx/pdfx.dart';
@@ -14,101 +15,241 @@ class PDFListScreen extends StatefulWidget {
 }
 
 class _PDFListScreenState extends State<PDFListScreen> {
-  PdfHandler pdfHandler = PdfHandler();
-  Directory? directory;
+  final currencyFormatter = NumberFormat.currency(locale: 'en_US', symbol: '\$');
   List<File> pdfFiles = [];
-  List<dynamic> pdfParsed= [];
-  double total = 0;
+  Map<String, ImageProvider> pdfThumbnails = {};
+  List<Map<String, dynamic>> extractedText = [];
+  PdfHandler pdfHandler = PdfHandler();
+  num totalBills = 0;
+  num totalAmount = 0;
 
-  late Future<List<File>> _pdfFilesFuture;
 
   @override
   void initState() {
     super.initState();
-    _pdfFilesFuture = _getDownloadedPdfs();
+    loadPdfs();
+    
   }
 
   //Extract values from pdfText
   dynamic extractValuesFromPdf(String value, List<String>pdfLines) {
 
-    for (String text in pdfLines) {
-      
+    for (String text in pdfLines) {    
       if(text.toLowerCase().contains(value.toLowerCase())) {
         return text;
       }
-      
     }
-
     return "NIT de la empresa";
   }
 
-  Future<List<File>> _getDownloadedPdfs() async {
-    Directory? appDir = await getExternalStorageDirectory();
-    Directory invoicesDir = Directory("${appDir!.path}/invoices");
+  //Extract values from pdfText
+  dynamic extractBillNumber(List<String>pdfLines) {
 
-    if (!invoicesDir.existsSync()) return [];
-
-    return invoicesDir
-        .listSync()
-        .where((file) => file.path.endsWith('.pdf'))
-        .map((file) => File(file.path))
-        .toList();
+    String value = "Número de Factura";
+    for (String text in pdfLines) { 
+      if(text.toLowerCase().contains(value.toLowerCase())) {
+        String subtring = text.substring(21,33);
+        return subtring;
+      }
+    }
   }
 
+  //Extract values from pdfText
+  dynamic extractCompany(List<String>pdfLines) {
+    String value = "Razón Social";
+    for (String text in pdfLines) {
+      if(text.toLowerCase().contains(value.toLowerCase())) {
+        if(text.length > 40) {
+          String subtring = text.substring(16, 40) + '...';
+          return subtring;
+        }
+          String subtring = text.substring(14,);
+          return subtring;
+        
+      }
+      
+    }
+  }
 
-  Future<PdfPageImage?> _generateThumbnail(File pdfFile) async {
-    final document = await PdfDocument.openFile(pdfFile.path);
+  String? extractDate(List<String> textList) {
+  // Regex pattern for various date formats
+  RegExp datePattern = RegExp(
+      r'\b(?:\d{4}[-./]\d{2}[-./]\d{2}|\d{2}/\d{2}/\d{4}|\d{2}-\d{2}-\d{4})\b');
+
+  for (String text in textList) {
+    RegExpMatch? match = datePattern.firstMatch(text);
+    if (match != null) {
+      return match.group(0); // Return the first found date
+    }
+  }
+  
+  return null; // Return null if no date is found
+}
+
+String? extractTotalPrice(List<String> textList) {
+  // Regex pattern to find "COP $" followed by any text
+  RegExp pattern = RegExp(r'(?<=COP \$)\s*\S+');
+
+  for (String text in textList) {
+    RegExpMatch? match = pattern.firstMatch(text);
+    if (match != null) {
+      return match.group(0); // Return the first matched text
+    }
+  }
+  
+  return ""; // Return null if no match is found
+}
+
+
+
+ Future<void> loadPdfs() async {
+    Directory? appDir = await getExternalStorageDirectory();
+
+    if (appDir == null) {
+      print("Error: External storage directory is null.");
+      return;
+    }
+
+    Directory invoicesDir = Directory("${appDir.path}/invoices");
+
+    if (await invoicesDir.exists()) {
+      List<FileSystemEntity> files = invoicesDir.listSync();
+      List<File> pdfs = files
+          .where((file) => file.path.endsWith('.pdf'))
+          .map((e) => File(e.path))
+          .toList();
+
+      setState(() {
+        pdfFiles = pdfs;
+        totalBills = pdfs.length;
+        extractedText = List.generate(pdfs.length, (index) => {}); // Initialize list to avoid null issues
+      });
+
+      for (int i = 0; i < pdfFiles.length; i++) {
+        var pdf = pdfFiles[i];
+        if (await pdf.exists()) {
+          try {
+            await generateThumbnail(pdf);
+
+            Map<String, dynamic> resultPdf = await extractTextFromPdf(pdf);
+
+            setState(() {
+              extractedText[i] = resultPdf; // Update each extracted text entry safely
+            });
+
+          } catch (e) {
+            print("Error processing PDF ${pdf.path}: $e");
+          }
+        } else {
+          print("Error: PDF file does not exist: ${pdf.path}");
+        }
+      }
+
+    } else {
+      print("Error: Invoices directory does not exist: ${invoicesDir.path}");
+    }
+  }
+
+  /// Generate PDF thumbnail (first page)
+  Future<void> generateThumbnail(File pdf) async {
+    final document = await PdfDocument.openFile(pdf.path);
     final page = await document.getPage(1);
-
     final image = await page.render(
-      width: page.width,
-      height: page.height,
+      width: 100, // Adjust width as needed
+      height: 150, // Adjust height as needed
       format: PdfPageImageFormat.png,
     );
-
     await page.close();
-    return image;
+
+    if (image != null) {
+      setState(() {
+        pdfThumbnails[pdf.path] = MemoryImage(image.bytes);
+      });
+    }
   }
+
+  /// Extract text using read_pdf_text package
+  Future<dynamic> extractTextFromPdf(File pdf) async {
+    String? pdfContent = await ReadPdfText.getPDFtext(pdf.path);
+    List<String> lines = pdfContent.split('\n');
+    Map<String, dynamic> parsedPdf = {};
+    String? total = extractTotalPrice(lines);
+  
+    String billNumber = extractBillNumber(lines);
+    String company = extractCompany(lines);
+    String? date = extractDate(lines);
+    String? formatTotal = total!.replaceAll('.', '').replaceAll(',', '.');
+
+    parsedPdf = pdfHandler.parseDIANpdf(billNumber, company, date!, formatTotal);
+
+    setState(() {
+      totalAmount += double.parse(formatTotal);
+    });
+
+    return parsedPdf;
+  }
+
+  void openPdf(String path) async {
+    await OpenFilex.open(path);
+  }
+  
+  
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Invoices")),
-      body: FutureBuilder<List<File>>(
-        future: _pdfFilesFuture,
-        builder: (context, snapshot) {
-          if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
-          List<File> pdfFiles = snapshot.data!;
+      appBar: AppBar(title: const Text("Lista de PDFs")),
+      body: Padding(
+        padding: const EdgeInsets.all(15),
+        child: Column(
+          children: [
+            Container(
+              margin: const EdgeInsets.all(20),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(children: [Icon(Icons.attach_money, color: Colors.green, size: 30), Text("Total: ${NumberFormat('#,##0', 'en_US').format(totalAmount)}", style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600))]),
+                  Row(children: [Icon(Icons.receipt, color: Colors.green, size: 30), Text("Facturas: $totalBills", style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w600))])
+                ]
+              ),
+            ),
+            pdfFiles.isEmpty
+          ? const Center(child: Text("Todavía no tienes PDFs."),)
+          : Expanded(
+            child: ListView.builder(
+              itemCount: pdfFiles.length,
+              itemBuilder: (context, index) {
+                final file = pdfFiles[index];
 
-          if (pdfFiles.isEmpty) return const Center(child: Text("No PDFs found"));
+                // Ensure extractedText[index] exists before accessing keys
+                final data = (index < extractedText.length) ? extractedText[index] : {};
 
-          return ListView.builder(
-            padding: const EdgeInsets.all(8),
-            itemCount: pdfFiles.length,
-            itemBuilder: (context, index) {
-              File pdfFile = pdfFiles[index];
+                double totalAmount = double.tryParse(data['total']?.toString() ?? '0') ?? 0;
 
-              return FutureBuilder<PdfPageImage?>(
-                future: _generateThumbnail(pdfFile),
-                builder: (context, snapshot) {
-                  return ListTile(
-                    leading: snapshot.hasData
-                        ? Image.memory(snapshot.data!.bytes, width: 50, height: 50, fit: BoxFit.cover)
-                        : const SizedBox(width: 50, height: 50, child: CircularProgressIndicator()),
-                    title: Text(pdfFile.path.split('/').last),
-                    onTap: () async {
-                      await OpenFilex.open(pdfFile.path);
-                    },
-                  );
-                },
-              );
-            },
-          );
-        },
-      ),
+                return Card(
+                  child: ListTile(
+                    leading: pdfThumbnails[file.path] != null
+                        ? Image(image: pdfThumbnails[file.path]!)
+                        : const CircularProgressIndicator(),
+                    title: Text(data['bill_number'] ?? "Extracting text..."),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(data['company'] ?? ''),
+                        Text(data['date'] ?? ''),
+                        Text(currencyFormatter.format(totalAmount), style: const TextStyle(fontWeight: FontWeight.w600)),
+                      ],
+                    ),
+                    onTap: () => openPdf(file.path),
+                  ),
+                );
+              },
+            )
+          ),
+          ]
+        ),
+      )
     );
   }
-
-
+  
 }
-

@@ -6,18 +6,32 @@ class PdfHandler {
 
   //Read QR bill from Peru
   Map<String, dynamic> parseQrPeru(String qrResult) {
-    List qrList = qrResult.split(' | ');
-    List keys = ['ruc_company', 'receipt_id', 'code_start', 'code_end', 'igv', 'amount', 'date', 'percentage', 'ruc_customer', 'summery'];
 
-    Map<String, dynamic> qrPdf = {};
+    try {
+      List qrList = qrResult.split('|');
+      List keys = ['ruc_company', 'receipt_id', 'code_start', 'code_end', 'igv', 'amount', 'date', 'percentage', 'ruc_customer', 'summery'];
 
-    for (var i = 0; i < qrList.length; i++) {
-      qrPdf[keys[i]] = qrList[i];
+      Map<String, dynamic> qrPdf = {};
+
+      for (var i = 0; i < keys.length; i++) {
+         if (i >= qrList.length || qrList[i].trim().isEmpty) {
+            qrPdf[keys[i]] = "Empty";
+          } else {
+            qrPdf[keys[i]] = qrList[i];
+          }
+        
+      }
+
+      print(qrPdf);
+
+      return qrPdf;
+    } catch(e) {
+      Map<String, dynamic> error = {
+        'error': e
+      };
+      return error;
     }
-
-    print(qrPdf);
-
-    return qrPdf;
+    
   }
 
 
@@ -75,7 +89,7 @@ class PdfHandler {
   }
 
 
-  Map<String, dynamic> parseDIANpdf(String billNumber, String company, String date, String total) {
+  Map<String, dynamic> parseDIANpdf(String billNumber, String company, String? date, String? total) {
     Map<String, dynamic> dianPdf = {
       'bill_number': billNumber,
       'company': company,

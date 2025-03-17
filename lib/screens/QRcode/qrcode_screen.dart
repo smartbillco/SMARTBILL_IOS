@@ -8,7 +8,7 @@ import 'package:smartbill/services.dart/pdf.dart';
 
 
 class QrcodeScreen extends StatefulWidget {
-  final String? qrResult;
+  final String qrResult;
   const QrcodeScreen({super.key, required this.qrResult});
 
   @override
@@ -33,7 +33,7 @@ class _QrcodeScreenState extends State<QrcodeScreen> {
   void isValidUri() {
     setState(() {
       isUri = Uri.tryParse(widget.qrResult!)?.hasScheme ?? false;
-      pdfPeru = pdfHandler.parseQrPeru(widget.qrResult!);
+      pdfPeru = pdfHandler.parseQrPeru(widget.qrResult);
     });
   }
 
@@ -74,7 +74,7 @@ class _QrcodeScreenState extends State<QrcodeScreen> {
                     allowFileAccess: true,
                     allowContentAccess: true,
                   ),
-                  initialUrlRequest: URLRequest(url: WebUri.uri(Uri.parse('https://catalogo-vpfe.dian.gov.co/User/SearchDocument'))),
+                  initialUrlRequest: URLRequest(url: WebUri(widget.qrResult)),
                   onWebViewCreated: (controller) {
                     webViewController = controller;
                   },
@@ -87,16 +87,13 @@ class _QrcodeScreenState extends State<QrcodeScreen> {
                     String fileName = "invoice_${DateTime.now().millisecondsSinceEpoch}.pdf";
 
                     try {
-                        final taskId = FlutterDownloader.enqueue(
+                        await FlutterDownloader.enqueue(
                         url: request.url.toString(),
                         savedDir: path,
                         fileName: fileName,
                         showNotification: true,
                         openFileFromNotification: true,
                       );
-
-                      print(taskId);
-
                     
                       showSnackbar("Archivo descargado. Estamos redireccionando.");
 

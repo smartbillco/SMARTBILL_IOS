@@ -37,8 +37,6 @@ class _QRScannerState extends State<QRScanner> {
         _scanning = false;
         _showSnackbarTimeout();
         Navigator.of(context).pop();
-
-        Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => const QrcodeScreen(qrResult: 'https://www.youtube.com',)));
       }
     });
   }
@@ -75,8 +73,7 @@ class _QRScannerState extends State<QRScanner> {
                   .stop()
                   .then((value) => scannerController.dispose())
                   .then((value) {
-                    print("PRINTING!!!!!! ${qrResult.rawValue}");
-                    Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => QrcodeScreen(qrResult: qrResult.rawValue,)));
+                    Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => QrcodeScreen(qrResult: qrResult.rawValue!)));
                   });
                             
             } else {

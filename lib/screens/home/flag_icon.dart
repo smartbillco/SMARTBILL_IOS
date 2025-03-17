@@ -119,6 +119,18 @@ class _FlagIconState extends State<FlagIcon> {
                     Text(ecuador.name)
                   ]
                 )
+              ),
+              PopupMenuItem(
+                onTap: () {
+                  changeFlag(usa);
+                },
+                child: Row(
+                  children: <Widget>[
+                    Image(image: AssetImage(usa.flag), width: 40, height: 40,),
+                    const SizedBox(width: 20,),
+                    Text(usa.name)
+                  ]
+                )
               )
               
             ]);
