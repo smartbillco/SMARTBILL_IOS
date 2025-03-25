@@ -86,11 +86,7 @@ class PdfHandler {
     final RegExp idRegex = RegExp(r'\b\d{10}\b'); // Matches exactly 10-digit numbers
     final RegExp dateRegex = RegExp(r'\b\d{1,2}[/.-]\d{1,2}[/.-]\d{2,4}\b'); // Matches various date formats
     final RegExp regexPrice = RegExp(r'(?:valor bruto|valor|total pagado|total|pagado|\$)\s*([\d.,]+)', caseSensitive: false);
-    RegExp regexIva = RegExp(r'IVA\s+(\d+\.?\d*)');
    
-
-    Match? ivaMatch = regexIva.firstMatch(pdf);
-    var iva = ivaMatch!.group(1);
     Iterable<Match> matches = regexPrice.allMatches(pdf);
     final lastGroup = matches.first.group(1).toString();
     String fixedCurrency = lastGroup.replaceAll(',', '');
@@ -117,7 +113,7 @@ class PdfHandler {
       'city': 'N/A'
     };
 
-    print("Extracted: $name, $company, $id, $date, $total, $iva");
+    print("Extracted: $name, $company, $id, $date, $total");
 
     return extractedPdf;
 
