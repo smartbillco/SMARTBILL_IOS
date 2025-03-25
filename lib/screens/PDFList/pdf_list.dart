@@ -5,7 +5,8 @@ import 'package:open_filex/open_filex.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdfx/pdfx.dart';
 import 'package:read_pdf_text/read_pdf_text.dart';
-import 'package:smartbill/services.dart/pdf.dart';
+import 'package:smartbill/screens/filter/filter.dart';
+import 'package:smartbill/services/pdf.dart';
 
 class PDFListScreen extends StatefulWidget {
   const PDFListScreen({super.key});
@@ -150,6 +151,10 @@ String? extractTotalPrice(List<String> textList) {
     }
   }
 
+  void redirectFilter() {
+    Navigator.push(context, MaterialPageRoute(builder: (context) => const FilterScreen()));
+  }
+
   /// Generate PDF thumbnail (first page)
   Future<void> generateThumbnail(File pdf) async {
     final document = await PdfDocument.openFile(pdf.path);
@@ -213,6 +218,20 @@ String? extractTotalPrice(List<String> textList) {
                 ]
               ),
             ),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: SizedBox(
+                width: 130,
+                child: ElevatedButton(
+                  style: ButtonStyle(
+                    side: WidgetStatePropertyAll(BorderSide(color: Colors.grey))
+                  ),
+                  onPressed: redirectFilter,
+                  child: const Text("Filtrar")
+                ),
+              ),
+            ),
+            const SizedBox(height: 15),
             pdfFiles.isEmpty
           ? const Center(child: Text("Todavía no tienes PDFs."),)
           : Expanded(

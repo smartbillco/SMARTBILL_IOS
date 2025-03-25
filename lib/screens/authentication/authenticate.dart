@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:smartbill/screens/authentication/otp.dart';
 import 'package:smartbill/screens/authentication/phone_image.dart';
-import 'package:smartbill/services.dart/auth.dart';
+import 'package:smartbill/services/auth.dart';
 
 const List countryCode = ["+57", "+51", "+33", "+1", "+56", "+55", "+34", "+507"];
 

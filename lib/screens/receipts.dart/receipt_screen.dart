@@ -4,10 +4,10 @@ import 'package:smartbill/screens/receipts.dart/receipt_modal.dart';
 import 'package:smartbill/screens/receipts.dart/receipt_widgets/delete_dialog.dart';
 import 'package:smartbill/screens/receipts.dart/receipt_widgets/searchbar.dart';
 import 'package:smartbill/screens/receipts.dart/receipt_widgets/total_sum.dart';
-import 'package:smartbill/services.dart/pdf.dart';
-import 'package:smartbill/services.dart/xml/xml.dart';
-import 'package:smartbill/services.dart/xml/xml_colombia.dart';
-import 'package:smartbill/services.dart/xml/xml_peru.dart';
+import 'package:smartbill/services/pdf.dart';
+import 'package:smartbill/services/xml/xml.dart';
+import 'package:smartbill/services/xml/xml_colombia.dart';
+import 'package:smartbill/services/xml/xml_peru.dart';
 import 'package:xml/xml.dart';
 
 class ReceiptScreen extends StatefulWidget {
@@ -25,20 +25,6 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
   double totalColombia = 0;
   double totalPeru = 0;
   List<dynamic> _fileContent = [];
-
-  //Extract values from pdfText
-  dynamic extractValuesFromPdf(String value, List<String>pdfLines) {
-
-    for (String text in pdfLines) {
-      
-      if(text.toLowerCase().contains(value.toLowerCase())) {
-        return text;
-      }
-      
-    }
-
-    return "NIT de la empresa";
-  }
 
   //Get all XML files from sqlite
   void getReceipts() async {
@@ -84,11 +70,9 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
 
     for(var item in pdfFiles) {
 
-      List<String> pdfTextLines = item['pdf_text'].split('\n');
+      Map<String, dynamic> newPdf = pdfHandler.extractInfoFromPdf(item['pdf_text'], item['_id']);
 
-      final companyId = extractValuesFromPdf('nit', pdfTextLines);
-
-      final Map newPdf = pdfHandler.parsePdf(item['_id'], companyId, item['pdf_text']);
+      totalPaidColombia += double.parse(newPdf['price']);
 
       myFiles.add(newPdf);
 
@@ -203,7 +187,7 @@ class _ListReceiptsState extends State<ListReceipts> {
              context: context,
              builder: (_) => DeleteDialogWidget(
               item: widget.fileContent[widget.index],
-              func: widget.getReceipts));
+              func: widget.getReceipts)); 
           },
           icon: const Icon(Icons.delete, size: 25, color: Colors.redAccent)),
 

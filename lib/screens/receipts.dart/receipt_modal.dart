@@ -18,24 +18,6 @@ class _BillDetailScreenState extends State<BillDetailScreen> {
   @override
   void initState() {
     super.initState();
-    formatPdfContent();
-  }
-
-  void formatPdfContent() {
-    if(widget.receipt.containsKey('text')) {
-      List pdfTextLines = widget.receipt['text'].split('\n');
-
-      for (var i = 0; i < 12; i++) {
-        if(pdfTextLines[i].contains(':')) {
-          textPdf.add(pdfTextLines[i]);
-        } else {
-          var fullLine = pdfTextLines[i] + ':';
-          textPdf.add(fullLine);
-        }
-      }
-      print("Printing: $textPdf");
-
-    }
     
   }
 
@@ -124,6 +106,7 @@ class _BillDetailScreenState extends State<BillDetailScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   ReceiptRows(type: "Cliente", value: widget.receipt['customer'].toUpperCase()),
+                  ReceiptRows(type: "Id Cliente", value: widget.receipt['customer_id'].toUpperCase()),
                   ReceiptRows(type: "Identificación", value: widget.receipt['company'].toUpperCase()),
                   ReceiptRows(type: "Compañia", value: widget.receipt['company_id']),
                   ReceiptRows(type: "Fecha", value: widget.receipt['date']),

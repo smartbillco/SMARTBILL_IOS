@@ -103,7 +103,7 @@ class _QRScannerState extends State<QRScanner> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(Icons.camera_alt, size: 100, color: Color.fromARGB(85, 255, 255, 255),),
+                      const Icon(Icons.camera_alt, size: 100, color: Color.fromARGB(122, 255, 255, 255),),
                       Transform.translate(
                         offset: const Offset(0, 60),
                         child: const Text("Escanea tu factura", style: TextStyle(color: Color.fromARGB(150, 255, 255, 255), fontSize: 18))
@@ -130,7 +130,7 @@ class QrScannerOverlayShape extends ShapeBorder {
   QrScannerOverlayShape({
     this.borderColor = Colors.red,
     this.borderWidth = 3.0,
-    this.overlayColor = const Color.fromRGBO(0, 0, 0, 80),
+    this.overlayColor = const Color.fromARGB(131, 0, 0, 0),
     this.borderRadius = 0,
     this.borderLength = 40,
     double? cutOutSize,

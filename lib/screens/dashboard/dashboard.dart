@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:smartbill/screens/dashboard/dashboard_widgets/dashboard_container.dart';
-import 'package:smartbill/services.dart/auth.dart';
-import 'package:smartbill/services.dart/pdf.dart';
-import 'package:smartbill/services.dart/xml/xml.dart';
+import 'package:smartbill/screens/deleteAccount/delete_account.dart';
+import 'package:smartbill/services/auth.dart';
+import 'package:smartbill/services/pdf.dart';
+import 'package:smartbill/services/xml/xml.dart';
 
 
 class DashboardScreen extends StatefulWidget {
@@ -49,6 +50,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
     _auth.logout(context);
   }
 
+  //Logout
+  void redirectDeleteAccount() {
+    Navigator.push(context, MaterialPageRoute(builder: (context) => const DeleteAccountScreen()));
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -80,6 +86,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   icon: const Icon(Icons.menu_rounded, color: Colors.white,),
                   itemBuilder: (BuildContext context) => [
                     PopupMenuItem(onTap: logginOut, child: const Text("Logout")),
+                    PopupMenuItem(onTap: redirectDeleteAccount, child: const Text("Eliminar cuenta")),
                   ],
                 ),
               ],

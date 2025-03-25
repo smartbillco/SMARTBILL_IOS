@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:smartbill/services.dart/pdf.dart';
-import 'package:smartbill/services.dart/xml/xml.dart';
+import 'package:smartbill/services/pdf.dart';
+import 'package:smartbill/services/xml/xml.dart';
 
 
 //Creating the delete confirm dialog
@@ -19,9 +19,11 @@ class _DeleteDialogWidgetState extends State<DeleteDialogWidget> {
 
   Future deleteFile(item) async {
     try {
-      if(item['text'] == null) {
+      if(item['is_pdf'] == null) {
+        print("NOT NULLLLL");
         await xmlhandler.deleteXml(item['_id']);
       } else {
+        print("NULLLLL");
         await pdfHandler.deletePdf(item['_id']);
       }
     } catch (e) {

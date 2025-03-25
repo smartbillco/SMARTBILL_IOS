@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:smartbill/services.dart/crypto.dart';
+import 'package:smartbill/services/crypto.dart';
 
 
 class CryptoList extends StatefulWidget {

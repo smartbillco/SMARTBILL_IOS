@@ -4,7 +4,8 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:smartbill/screens/PDFList/pdf_list.dart';
-import 'package:smartbill/services.dart/pdf.dart';
+import 'package:smartbill/screens/confirmDownload/confirm_download.dart';
+import 'package:smartbill/services/pdf.dart';
 
 
 class QrcodeScreen extends StatefulWidget {
@@ -21,18 +22,21 @@ class _QrcodeScreenState extends State<QrcodeScreen> {
   late InAppWebViewController webViewController;
   Map pdfPeru = {};
 
+  //DIAN receipt variables
+  String? originalUrl;
+  bool hasNavigated = false;
+
 
   @override
   void initState() {
     super.initState();
     isValidUri();
-
   }
 
 
   void isValidUri() {
     setState(() {
-      isUri = Uri.tryParse(widget.qrResult!)?.hasScheme ?? false;
+      isUri = Uri.tryParse(widget.qrResult)?.hasScheme ?? false;
       pdfPeru = pdfHandler.parseQrPeru(widget.qrResult);
     });
   }
@@ -77,6 +81,16 @@ class _QrcodeScreenState extends State<QrcodeScreen> {
                   initialUrlRequest: URLRequest(url: WebUri(widget.qrResult)),
                   onWebViewCreated: (controller) {
                     webViewController = controller;
+                  },
+                  onLoadStart: (controller, url) {
+                    originalUrl ??= url.toString();
+                  },
+                  onUpdateVisitedHistory: (controller, url, isReload) {
+                    //WidgetsBinding.instance.addPostFrameCallback((_) { });
+                    if(originalUrl != null && originalUrl != url.toString() && !hasNavigated) {
+                      hasNavigated = true;
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => ConfirmDownloadScreen(url: url.toString())));
+                    }
                   },
                   onDownloadStartRequest: (controller, request) async {
 

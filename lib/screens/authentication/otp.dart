@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pinput/pinput.dart';
 import 'package:smartbill/screens/dashboard/dashboard.dart';
-import 'package:smartbill/services.dart/auth.dart';
+import 'package:smartbill/services/auth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class OtpScreen extends StatefulWidget {

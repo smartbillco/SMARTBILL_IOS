@@ -4,8 +4,8 @@ import 'package:smartbill/screens/PDFList/pdf_list.dart';
 import 'package:smartbill/screens/dashboard/dashboard_widgets/dashboard_text.dart';
 import 'package:smartbill/screens/QRcode/qr_scanner.dart';
 import 'package:smartbill/screens/receipts.dart/receipt_screen.dart';
-import 'package:smartbill/services.dart/pdf.dart';
-import 'package:smartbill/services.dart/xml/xml.dart';
+import 'package:smartbill/services/pdf.dart';
+import 'package:smartbill/services/xml/xml.dart';
 
 class DashboardContainer extends StatefulWidget {
   const DashboardContainer({super.key});
