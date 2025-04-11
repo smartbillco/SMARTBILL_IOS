@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:smartbill/screens/QRcode/qrcode_link_screen.dart';
 import 'package:smartbill/screens/QRcode/qrcode_screen.dart';
 
 class QRScanner extends StatefulWidget {
@@ -15,6 +16,7 @@ class _QRScannerState extends State<QRScanner> {
   MobileScannerController scannerController = MobileScannerController();
   Timer? _timeoutTimer;
   bool _scanning = true;
+  bool isUri = true;
 
 
 
@@ -40,6 +42,11 @@ class _QRScannerState extends State<QRScanner> {
       }
     });
   }
+
+  bool checkIfIsUri(String? result) {
+    Uri? uri = Uri.tryParse(result!);
+    return uri != null && uri.hasScheme && uri.hasAuthority;
+  } 
 
 
   @override
@@ -70,11 +77,17 @@ class _QRScannerState extends State<QRScanner> {
               _scanning = false;
               //To do with code
               await scannerController
-                  .stop()
-                  .then((value) => scannerController.dispose())
-                  .then((value) {
-                    Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => QrcodeScreen(qrResult: qrResult.rawValue!)));
-                  });
+                .stop()
+                .then((value) => scannerController.dispose())
+                .then((value) {
+                  var isUri = checkIfIsUri(qrResult.rawValue);
+                  if(isUri) {
+                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => QrcodeLinkScreen(uri: qrResult.rawValue)));
+                  } else {
+                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => QrcodeScreen(qrResult: qrResult.rawValue!)));
+                  }
+                    
+                });
                             
             } else {
                   _showSnackbarError("ERROR");

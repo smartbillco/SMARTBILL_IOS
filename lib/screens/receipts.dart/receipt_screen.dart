@@ -4,9 +4,12 @@ import 'package:smartbill/screens/receipts.dart/receipt_modal.dart';
 import 'package:smartbill/screens/receipts.dart/receipt_widgets/delete_dialog.dart';
 import 'package:smartbill/screens/receipts.dart/receipt_widgets/searchbar.dart';
 import 'package:smartbill/screens/receipts.dart/receipt_widgets/total_sum.dart';
+import 'package:smartbill/services/colombian_bill.dart';
 import 'package:smartbill/services/pdf.dart';
+import 'package:smartbill/services/peruvian_bill.dart';
 import 'package:smartbill/services/xml/xml.dart';
 import 'package:smartbill/services/xml/xml_colombia.dart';
+import 'package:smartbill/services/xml/xml_panama.dart';
 import 'package:smartbill/services/xml/xml_peru.dart';
 import 'package:xml/xml.dart';
 
@@ -18,13 +21,23 @@ class ReceiptScreen extends StatefulWidget {
 }
 
 class _ReceiptScreenState extends State<ReceiptScreen> {
+  //Colombian and peruvian bills stored in database
+  final ColombianBill colombianBill = ColombianBill();
+  final PeruvianBill peruvianBill = PeruvianBill();
+
+  //Handle of XML stored
   final XmlColombia xmlColombia = XmlColombia();
   final XmlPeru xmlPeru = XmlPeru();
+  final XmlPanama xmlPanama = XmlPanama();
   final Xmlhandler xmlhandler = Xmlhandler();
   final PdfHandler pdfHandler = PdfHandler();
+
+  //Handling sums
   double totalColombia = 0;
   double totalPeru = 0;
+  double totalPanama = 0;
   List<dynamic> _fileContent = [];
+
 
   //Get all XML files from sqlite
   void getReceipts() async {
@@ -33,6 +46,7 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
     List myFiles = [];
     double totalPaidColombia = 0;
     double totalPaidPeru = 0;
+    double totalPaidPanama = 0;
 
 
     for (var item in xmlFiles) {
@@ -49,6 +63,16 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
 
         myFiles.add(newPeruvianXml);
 
+      } else if(xmlDocument.findAllElements('rFE').isNotEmpty) {
+
+        final Map newPanamanianXml = xmlPanama.parsedPanamaXml(item['_id'], xmlDocument);
+
+        print("Price: ${newPanamanianXml['price']}");
+
+        totalPaidPanama += double.parse(newPanamanianXml['price']);
+
+        myFiles.add(newPanamanianXml);
+
       } else {
 
         //Colombian logic
@@ -64,7 +88,6 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
 
         
       }
-
       
     }
 
@@ -78,15 +101,33 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
 
     }
 
+    //Get colombian bills saved in database
+    var bills = await colombianBill.getColombianBills();
+    for(var bill in bills) {
+      Map newMap = colombianBill.parseColombianBills(bill);
+      totalPaidColombia += double.parse(newMap['price']);
+      myFiles.add(newMap);
+      
+    }
+
+    var peruBills = await peruvianBill.getPeruvianBills();
+    for(var bill in peruBills) {
+      Map newMap = peruvianBill.parsePeruvianBills(bill);
+      totalPaidPeru += double.parse(newMap['price']);
+
+      myFiles.add(newMap);
+    }
+
+
     if (mounted) {
       setState(() {
         _fileContent = myFiles;
         totalColombia = totalPaidColombia;
         totalPeru = totalPaidPeru;
+        totalPanama = totalPaidPanama;
       });
     }
   }
-
 
   
 
@@ -107,7 +148,7 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            TotalSumWidget(totalColombia: totalColombia, totalPeru: totalPeru),
+            TotalSumWidget(totalColombia: totalColombia, totalPeru: totalPeru, totalPanama: totalPanama),
             const SizedBox(height: 25),
             const SearchbarWidget(),
             const SizedBox(height: 15),
@@ -178,7 +219,7 @@ class _ListReceiptsState extends State<ListReceipts> {
         children: [
           Text(widget.fileContent[widget.index]['company'], style: const TextStyle(fontSize: 18)),
           Text(widget.fileContent[widget.index]['company_id'], style: const TextStyle(fontSize: 16)),
-          Text('${widget.fileContent[widget.index]['currency']}: ${NumberFormat('#,##0', 'en_US').format(double.parse(widget.fileContent[widget.index]['price']))}', style: const TextStyle(fontSize: 16)),
+          Text('${widget.fileContent[widget.index]['currency']}: ${NumberFormat('#,##0.00', 'en_US').format(double.parse(widget.fileContent[widget.index]['price']))}', style: const TextStyle(fontSize: 16)),
         ]
       ),
       trailing:  IconButton(

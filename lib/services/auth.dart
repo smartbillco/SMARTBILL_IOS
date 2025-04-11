@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:smartbill/screens/dashboard/dashboard.dart';
 import 'package:smartbill/screens/home/home_screen.dart';
 import 'package:smartbill/services/db.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 
 class AuthService {
@@ -78,15 +79,17 @@ class AuthService {
 
   }
 
-
   //Delete account
   Future deleteAccount() async {
-    try {
-      
-      User? user = FirebaseAuth.instance.currentUser;
+    User? user = FirebaseAuth.instance.currentUser;
+    FirebaseFirestore firestore = FirebaseFirestore.instance;
+
+
+    try {  
 
       if(user != null) {
         await user.delete();
+        await firestore.collection('users').doc(user.uid).delete();
         await db.deleteDb();
         print("Account deleted");
       }

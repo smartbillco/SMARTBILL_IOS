@@ -4,7 +4,34 @@ import 'package:smartbill/services/db.dart';
 
 class PdfHandler {
 
+  //Read new Colombian QR code
+  Map<String, dynamic> parseQrColombia(String qrResult) {
+    try {
+      List lines = qrResult.split('\n');
+      List qrList = lines.map((item) => item.split(':').last).toList();
+      List keys = ['bill_number', 'date', 'time', 'nit', 'customer_id', 'amount_before_iva', 'iva', 'other_tax', 'total_amount', 'cufe'];
 
+      Map<String, dynamic> qrPdf = {};
+
+      for(var i = 0; i < keys.length; i++){
+        if(i >= qrList.length || qrList[i].trim().isEmpty) {
+          qrPdf[keys[i]] = "Vacio";
+        } else {
+          qrPdf[keys[i]] = qrList[i];
+        }
+      }
+
+      print("Printing QR pdf $qrPdf");
+
+      return qrPdf;
+
+    } catch(e) {
+      Map<String, dynamic> error = {
+        'error': e
+      };
+      return error;
+    }
+  }
 
   //Read QR bill from Peru
   Map<String, dynamic> parseQrPeru(String qrResult) {
@@ -51,7 +78,6 @@ class PdfHandler {
         'date': '',
         'time': '',
         'currency': 'PDF',
-        'text': text
     };
 
     return newPdf;
@@ -85,18 +111,24 @@ class PdfHandler {
     final RegExp companyRegex = RegExp(r'\b(NIT|NIF)\s*([\w\d.-]+)', caseSensitive: false);
     final RegExp idRegex = RegExp(r'\b\d{10}\b'); // Matches exactly 10-digit numbers
     final RegExp dateRegex = RegExp(r'\b\d{1,2}[/.-]\d{1,2}[/.-]\d{2,4}\b'); // Matches various date formats
-    final RegExp regexPrice = RegExp(r'(?:valor bruto|valor|total pagado|total|pagado|\$)\s*([\d.,]+)', caseSensitive: false);
-   
-    Iterable<Match> matches = regexPrice.allMatches(pdf);
-    final lastGroup = matches.first.group(1).toString();
-    String fixedCurrency = lastGroup.replaceAll(',', '');
+    final RegExp priceRegex = RegExp(r'(?:valor bruto|valor|total pagado|total|pagado|\$)\s*([\d.,]+)', caseSensitive: false);
+    Iterable<Match> matches = priceRegex.allMatches(pdf);
+    String? fixedCurrency;
+
+    if (matches.isNotEmpty) {
+      final String lastGroup = matches.first.group(1) ?? ''; // Ensure null safety
+      fixedCurrency = lastGroup.replaceAll(',', '');
+    } else {
+      fixedCurrency = '0';
+    }
+    
 
     // Extract matches
     final String? name = nameRegex.firstMatch(pdf)?.group(0);
     final String company = companyRegex.firstMatch(pdf)?.group(0).toString() ?? 'Nit:' ;
     final String? id = idRegex.firstMatch(pdf)?.group(0);
     final String? date = dateRegex.firstMatch(pdf)?.group(0);
-    final String total = fixedCurrency;
+    final String? total = fixedCurrency;
 
     Map<String, dynamic> extractedPdf = {
       'is_pdf': true,
@@ -107,7 +139,7 @@ class PdfHandler {
       'company_id': company,
       'date': date,
       'price': total,
-      'currency': 'COP',
+      'currency': 'PDF',
       'time': '0:00',
       'cufe': 'No encontrado',
       'city': 'N/A'
