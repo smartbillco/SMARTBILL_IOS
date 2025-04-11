@@ -1,11 +1,7 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:flutter_downloader/flutter_downloader.dart';
-import 'package:smartbill/screens/PDFList/pdf_list.dart';
-import 'package:smartbill/screens/confirmDownload/confirm_download.dart';
+import 'package:smartbill/services/colombian_bill.dart';
 import 'package:smartbill/services/pdf.dart';
+import 'package:smartbill/services/peruvian_bill.dart';
 
 
 class QrcodeScreen extends StatefulWidget {
@@ -17,28 +13,38 @@ class QrcodeScreen extends StatefulWidget {
 }
 
 class _QrcodeScreenState extends State<QrcodeScreen> {
+  ColombianBill colombianBill = ColombianBill();
+  PeruvianBill peruvianBill = PeruvianBill();
   PdfHandler pdfHandler = PdfHandler();
-  bool isUri = true;
-  late InAppWebViewController webViewController;
-  Map pdfPeru = {};
-
-  //DIAN receipt variables
-  String? originalUrl;
-  bool hasNavigated = false;
+  bool isColombia = false;
+  bool isPeru =  false;
+  Map<String, Object?> pdfContent = {};
 
 
   @override
   void initState() {
     super.initState();
-    isValidUri();
+    pdfFormat();
   }
 
 
-  void isValidUri() {
-    setState(() {
-      isUri = Uri.tryParse(widget.qrResult)?.hasScheme ?? false;
-      pdfPeru = pdfHandler.parseQrPeru(widget.qrResult);
-    });
+  void pdfFormat() {
+    if(widget.qrResult.contains(':')) {
+      setState(() {
+        isPeru = false;
+        isColombia = true;
+        pdfContent = pdfHandler.parseQrColombia(widget.qrResult);
+      });
+
+    } else if (widget.qrResult.contains('|')){
+      setState(() {
+        isColombia = false;
+        isPeru = true;
+        pdfContent = pdfHandler.parseQrPeru(widget.qrResult);
+      });
+    }
+
+    print("QRContent: $pdfContent");
   }
 
   @override
@@ -60,6 +66,17 @@ class _QrcodeScreenState extends State<QrcodeScreen> {
   }
 
 
+  Future<void> saveNewColombianBill() async {
+    await colombianBill.saveColombianBill(pdfContent);
+    Navigator.pop(context);
+  }
+
+  Future<void> saveNewPeruvianBill() async {
+    await peruvianBill.savePeruvianBill(pdfContent);
+    Navigator.pop(context);
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -67,105 +84,12 @@ class _QrcodeScreenState extends State<QrcodeScreen> {
         title: const Text("Descargar factura"),
       ),
       body: Container(
-        padding: const EdgeInsets.all(25),
+        padding: const EdgeInsets.all(20),
         child: Column(
           children: [
-              isUri ?  
-              Expanded(
-                child: InAppWebView(
-                  initialSettings: InAppWebViewSettings(
-                    useOnDownloadStart: true,
-                    allowFileAccess: true,
-                    allowContentAccess: true,
-                  ),
-                  initialUrlRequest: URLRequest(url: WebUri(widget.qrResult)),
-                  onWebViewCreated: (controller) {
-                    webViewController = controller;
-                  },
-                  onLoadStart: (controller, url) {
-                    originalUrl ??= url.toString();
-                  },
-                  onUpdateVisitedHistory: (controller, url, isReload) {
-                    //WidgetsBinding.instance.addPostFrameCallback((_) { });
-                    if(originalUrl != null && originalUrl != url.toString() && !hasNavigated) {
-                      hasNavigated = true;
-                      Navigator.push(context, MaterialPageRoute(builder: (context) => ConfirmDownloadScreen(url: url.toString())));
-                    }
-                  },
-                  onDownloadStartRequest: (controller, request) async {
-
-                    final dir = await getExternalStorageDirectory(); // Returns app's external storage
-                    final path = "${dir!.path}/invoices";
-                    await Directory(path).create(recursive: true);
-
-                    String fileName = "invoice_${DateTime.now().millisecondsSinceEpoch}.pdf";
-
-                    try {
-                        await FlutterDownloader.enqueue(
-                        url: request.url.toString(),
-                        savedDir: path,
-                        fileName: fileName,
-                        showNotification: true,
-                        openFileFromNotification: true,
-                      );
-                    
-                      showSnackbar("Archivo descargado. Estamos redireccionando.");
-
-                      await delayNagivation();
-                        
-                      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const PDFListScreen()));
-
-                    } catch(e) {
-                      print("ERROR! $e");
-                      showSnackbar("Ha ocurrido un problema con el PDF");
-
-                    }
-                  },
-                ),
-              ): 
-              SizedBox(
-                height: 450,
-                child: Card(
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  elevation: 4,
-                  margin: const EdgeInsets.symmetric(vertical: 40, horizontal: 20),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "Factura No. ${pdfPeru['code_start']} - ${pdfPeru['code_end']}",
-                          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                        ),
-                        const Divider(),
-                        const SizedBox(height:10),
-                        _buildRow("NIF", pdfPeru['ruc_company']),
-                        _buildRow("Código", pdfPeru['receipt_id']),
-                        _buildRow("IGV", pdfPeru['igv']),
-                        _buildRow("Pago", pdfPeru['amount']),
-                        _buildRow("Fecha", pdfPeru['date']),
-                        _buildRow("RUC Cliente", pdfPeru['ruc_customer']),
-                        const SizedBox(height: 30),
-                        SizedBox(
-                          width: MediaQuery.of(context).size.width - 10,
-                          child: ElevatedButton(
-                            style: const ButtonStyle(
-                              backgroundColor: WidgetStatePropertyAll(Colors.greenAccent)
-                            ),
-                            onPressed: () {
-                              
-                            },
-                            child: const Text("Guardar factura")
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
-                )
-              )
-            
+              isColombia
+              ? _cardColombia(pdfContent, context, saveNewColombianBill)
+              : _cardPeru(pdfContent, context, saveNewPeruvianBill)
           ],
         ),
       ),
@@ -174,22 +98,118 @@ class _QrcodeScreenState extends State<QrcodeScreen> {
 }
 
 
-
-  Widget _buildRow(String title, String value) {
-    
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            title,
-            style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
-          ),
-          Text(value,
-          style: const TextStyle(fontWeight: FontWeight.w400, fontSize: 16),),
-        ],
+Widget _cardColombia(Map pdfContent, context, Future<void> Function() saveFunction) {
+  return SingleChildScrollView(
+    child: SizedBox(
+      child: Card(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      elevation: 4,
+      margin: const EdgeInsets.symmetric(vertical: 40, horizontal: 20),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              "Factura No. ${pdfContent['bill_number']}",
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const Divider(),
+            const SizedBox(height: 10),
+            _buildRow("NIT", pdfContent['nit']),
+            _buildRow("Id Clientes", pdfContent['customer_id']),
+            _buildRow("Sin IVA", pdfContent['amount_before_iva']),
+            _buildRow("IVA", pdfContent['iva']),
+            _buildRow("Pago", pdfContent['total_amount']),
+            _buildRow("Fecha", pdfContent['date']),
+            _buildRow("Hora", pdfContent['time']),
+            _buildRow("CUFE", pdfContent['cufe']),
+            const SizedBox(height: 30),
+            SizedBox(
+              width: MediaQuery.of(context).size.width - 10,
+              child: ElevatedButton(
+                  style: const ButtonStyle(
+                      backgroundColor:
+                          WidgetStatePropertyAll(Colors.greenAccent)),
+                  onPressed: () {
+                    saveFunction();
+                  },
+                  child: const Text("Guardar factura")),
+            )
+          ],
+        ),
       ),
-    );
-  }
+    )),
+  );
+}
+
+
+
+Widget _cardPeru(pdfContent, context, Future<void> Function() saveFunction) {
+  return SingleChildScrollView(
+    child: SizedBox(
+      height: 450,
+      child: Card(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      elevation: 4,
+      margin: const EdgeInsets.symmetric(vertical: 40, horizontal: 15),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text("Factura No. ${pdfContent['code_start']} - ${pdfContent['code_end']}",style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+            const Divider(),
+            const SizedBox(height:10),
+            _buildRow("NIF", pdfContent['ruc_company']),
+            _buildRow("Código", pdfContent['receipt_id']),
+            _buildRow("IGV", pdfContent['igv']),
+            _buildRow("Pago", pdfContent['amount']),
+            _buildRow("Fecha", pdfContent['date']),
+            _buildRow("RUC Cliente", pdfContent['ruc_customer']),
+            const SizedBox(height: 30),
+            SizedBox(
+              width: MediaQuery.of(context).size.width - 10,
+              child: ElevatedButton(
+                style: const ButtonStyle(
+                  backgroundColor: WidgetStatePropertyAll(Colors.greenAccent)
+                  ),
+                onPressed: () {
+                  saveFunction();
+                },
+                child: const Text("Guardar factura")
+                ),
+              )
+            ],
+          ),
+        ),
+      )
+    ),
+  );
+}
+
+
+Widget _buildRow(String title, String value) {
+  return Padding(
+    padding: const EdgeInsets.symmetric(vertical: 4),
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          title,
+          style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
+        ),
+        SizedBox(
+          width: 140,
+          child: Text(
+            value,
+            style: const TextStyle(fontWeight: FontWeight.w400, fontSize: 16),
+          ),
+        ),
+      ],
+    ),
+  );
+}
 

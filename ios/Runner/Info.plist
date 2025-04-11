@@ -51,6 +51,8 @@
 	<true/>
 	<key>NSCameraUsageDescription</key>
 	<string>Necesitamos acceso a la cámara para capturar fotos</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Necesitamos acceso a tu microfono</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Necesitamos permiso para acceder a tus archivos.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>

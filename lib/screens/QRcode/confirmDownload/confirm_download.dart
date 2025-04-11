@@ -2,7 +2,9 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
+import 'package:provider/provider.dart';
 import 'package:smartbill/screens/dashboard/dashboard.dart';
+import 'package:smartbill/services/settings.dart';
 
 class ConfirmDownloadScreen extends StatefulWidget {
   final String url;
@@ -15,12 +17,15 @@ class ConfirmDownloadScreen extends StatefulWidget {
 class _ConfirmDownloadScreenState extends State<ConfirmDownloadScreen> {
   String downloadUrl = "";
   bool isLoading = false;
+  bool isDian = false;
+  bool isPanama =  false;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     formDownloadUrl();
+    checkUrlAndExecute(widget.url);
   }
 
   String getTrackId() {
@@ -50,7 +55,9 @@ class _ConfirmDownloadScreenState extends State<ConfirmDownloadScreen> {
   void showSnackbar(String content) {
     final snackbar = SnackBar(content: Text(content));
 
-    ScaffoldMessenger.of(context).showSnackBar(snackbar);
+    if(mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(snackbar);
+    }
   }
 
   void formDownloadUrl() {
@@ -58,16 +65,32 @@ class _ConfirmDownloadScreenState extends State<ConfirmDownloadScreen> {
     String token = getTokenFromUrl();
 
     setState(() {
-      downloadUrl =
-          "https://catalogo-vpfe.dian.gov.co/Document/DownloadPDF?trackId=${id}&token=${token}";
+      downloadUrl = "https://catalogo-vpfe.dian.gov.co/Document/DownloadPDF?trackId=${id}&token=${token}";
     });
 
     print("This is the download url: $downloadUrl");
   }
 
-  Future<void> downloadPdfDian() async {
-    isLoading = true;
+  void checkUrlAndExecute(String url) {
+  final regex1 = RegExp(r'^https:\/\/catalogo-vpfe\.dian\.gov\.co\/User\/SearchDocument');
+  final regex2 = RegExp(r'^https:\/\/dgi-fep\.mef\.gob\.pa\/Consultas\/Facturas');
+  
+  if (regex1.hasMatch(url)) {
+    print("Ejecutando acción para el primer enlace");
+    // Coloca aquí la línea de código para el primer enlace
+  } else if (regex2.hasMatch(url)) {
+    print("Ejecutando acción para el segundo enlace");
+    // Coloca aquí la línea de código para el segundo enlace
+  } else {
+    print("URL no coincide con los patrones definidos");
+  }
+} 
 
+  Future<void> downloadPdfDian() async {
+    setState(() {
+      isLoading = true;
+    });
+    
     final dir = await getExternalStorageDirectory(); // Returns app's external storage
     final path = "${dir!.path}/invoices";
     await Directory(path).create(recursive: true);
@@ -83,11 +106,14 @@ class _ConfirmDownloadScreenState extends State<ConfirmDownloadScreen> {
         openFileFromNotification: true,
       );
 
-      isLoading = false;
+      await Future.delayed(const Duration(seconds: 3), () {
+        setState(() {
+          isLoading = false;
+        });
 
-      showSnackbar("Se ha descargado la factura");
-
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const DashboardScreen()));
+        showSnackbar("Se ha descargado la factura");
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const DashboardScreen()));
+      });
 
     } catch (e) {
 
@@ -97,6 +123,13 @@ class _ConfirmDownloadScreenState extends State<ConfirmDownloadScreen> {
 
   @override
   Widget build(BuildContext context) {
+
+    final autoDownloadOn = context.watch<SettingsProvider>().autoDownloadOn;
+
+    if(autoDownloadOn) {
+      downloadPdfDian();
+    }
+
     return Scaffold(
       appBar: AppBar(),
       body: Center(
@@ -116,7 +149,8 @@ class _ConfirmDownloadScreenState extends State<ConfirmDownloadScreen> {
                 Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const DashboardScreen()), (r) => false);
               },
               child: const Text("No", style: TextStyle(color: Colors.redAccent))
-            )
+            ),
+            
           ],
         ),
       ),

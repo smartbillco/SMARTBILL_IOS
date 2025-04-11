@@ -1,6 +1,9 @@
-import 'package:file_picker/file_picker.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:smartbill/screens/PDFList/pdf_list.dart';
+import 'package:smartbill/screens/camera/camera.dart';
+import 'package:smartbill/screens/expenses/expenses.dart';
+import 'package:smartbill/screens/dashboard/add_bill_choice.dart';
 import 'package:smartbill/screens/dashboard/dashboard_widgets/dashboard_text.dart';
 import 'package:smartbill/screens/QRcode/qr_scanner.dart';
 import 'package:smartbill/screens/receipts.dart/receipt_screen.dart';
@@ -18,70 +21,18 @@ class _DashboardContainerState extends State<DashboardContainer> {
   final Xmlhandler xmlhandler = Xmlhandler();
   final PdfHandler pdfHandler = PdfHandler();
 
-  //Open files and save and display a new XML
-  Future<void> _pickAndDisplayFile() async {
-    
-      FilePickerResult? fileResult = await FilePicker.platform.pickFiles(type: FileType.custom, allowedExtensions: ['xml', 'pdf']);
-
-      if (fileResult != null) {
-
-        String filePath = fileResult.files.single.path!;
-        String fileName = fileResult.files.single.name.toLowerCase();
-
-        if(fileName.endsWith('.pdf')) {
-          
-          await pdfHandler.getPDFtext(filePath);
-
-          Navigator.of(context).push(
-            MaterialPageRoute(builder: (context) => const ReceiptScreen()));
-
-          
-
-        } else if(fileName.endsWith('.xml')) {
-          await xmlhandler.getXml(filePath);
-
-          Navigator.of(context).push(
-            MaterialPageRoute(builder: (context) => const ReceiptScreen()));
-        }
-
-
-      } else {
-        print("Se cancelo");
-        _showSnackbarCancelXml();
-      }
-  }
-
-
   //redirect to receiptslist
-  void redirectReceiptList() {
-    Navigator.of(context).push(MaterialPageRoute(builder: (context) => const ReceiptScreen()));
+  void redirectToScreen(Widget screen) {
+    Navigator.of(context).push(MaterialPageRoute(builder: (context) => screen));
   }
-
-
-
-  //Redirect to QRcode
-  void redirectQRcode() {
-    Navigator.of(context).push(MaterialPageRoute(builder: (context) => const QRScanner()));
-  }
-
-  //Redirect to QRcode
-  void redirectPdfFiles() {
-    Navigator.of(context).push(MaterialPageRoute(builder: (context) => const PDFListScreen()));
-  }
-
-
-  //Snackbar for receipt cancel
-  //Cancelled picking a xml file
-  void _showSnackbarCancelXml() {
-    var snackbar = const SnackBar(content: Text("No elegiste una factura"), duration: Duration(seconds: 2),);
-    ScaffoldMessenger.of(context).showSnackBar(snackbar);
-  }
-
 
   @override
   Widget build(BuildContext context) {
+
+    final String? phone = FirebaseAuth.instance.currentUser!.phoneNumber;
+
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 35),
+      padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -90,18 +41,82 @@ class _DashboardContainerState extends State<DashboardContainer> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-             MenuButton(text: "Cargar factura", redirect: _pickAndDisplayFile, colors: const [Color.fromARGB(255, 126, 126, 126), Color.fromARGB(255, 31, 31, 31)]),
-             MenuButton(text: "Escanear QR", redirect: redirectQRcode, colors: const [Color.fromARGB(255, 20, 82, 175), Color.fromARGB(255, 4, 34, 80)])
+              MenuButton(
+                  icon: Icon(Icons.arrow_downward, color: Colors.white, size: 35),
+                  text: "Agregar ingreso",
+                  redirect: () {
+                    redirectToScreen(const ExpensesScreen());
+                  },
+                  colors: const [
+                    Color.fromARGB(255, 126, 126, 126),
+                    Color.fromARGB(255, 31, 31, 31)
+                  ]),
+              MenuButton(
+                icon: Icon(Icons.camera_alt, color: Colors.white, size: 35),
+                text: "Fotografíar Factura",
+                redirect: () {
+                  redirectToScreen(const CameraShotScreen());
+                },
+                colors: const [
+                  Color.fromARGB(255, 20, 82, 175),
+                  Color.fromARGB(255, 4, 34, 80)
+                ])
             ],
           ),
-          const SizedBox(height: 18),
+          const SizedBox(height: 14),
 
           //Second row of navigation
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-             MenuButton(text: "Mis facturas", redirect: redirectReceiptList, colors: const [Color.fromARGB(255, 238, 218, 42), Color.fromARGB(255, 175, 137, 11)]),
-             MenuButton(text: "PDFs DIAN", redirect: redirectPdfFiles, colors: const [Color.fromARGB(255, 47, 180, 51), Color.fromARGB(255, 16, 78, 20)] )
+              MenuButton(
+                icon: Icon(Icons.upload, color: Colors.white, size: 35),
+                text: "Cargar factura",
+                redirect: () {Navigator.push(context, MaterialPageRoute(builder: (context) => const AddBillChoice()));},
+                colors: const [
+                  Color.fromARGB(255, 48, 20, 175),
+                  Color.fromARGB(255, 15, 4, 80)
+                ]),
+              MenuButton(
+                icon: Icon(Icons.qr_code, color: Colors.white, size: 35),
+                text: "Escanear QR",
+                redirect: () {
+                  redirectToScreen(const QRScanner());
+                },
+                colors: const [
+                  Color.fromARGB(255, 252, 182, 30),
+                  Color.fromARGB(255, 172, 116, 13)
+                ])
+            ],
+          ),
+          const SizedBox(height: 14),
+
+          //Third row of navigation
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              MenuButton(
+                icon: Icon(Icons.receipt, color: Colors.white, size: 35),
+                text: "Mis facturas",
+                redirect: () {
+                  redirectToScreen(const ReceiptScreen());
+                },
+                colors: const [
+                  Color.fromARGB(255, 250, 229, 44),
+                   Color.fromARGB(255, 196, 153, 12)
+                ]),
+              phone!.startsWith('+57')
+              ? MenuButton(
+                icon: Icon(Icons.picture_as_pdf_outlined, color: Colors.white, size: 35),
+                text: "PDFs DIAN",
+                redirect: () {
+                  redirectToScreen(const PDFListScreen());
+                },
+                colors: const [
+                  Color.fromARGB(255, 29, 148, 33),
+                  Color.fromARGB(255, 10, 59, 13)
+                ])
+              : SizedBox.shrink()
             ],
           )
         ],
@@ -111,28 +126,47 @@ class _DashboardContainerState extends State<DashboardContainer> {
 }
 
 class MenuButton extends StatelessWidget {
+  final Icon icon;
   final String text;
   final VoidCallback redirect;
   final List<Color> colors;
-  const MenuButton({super.key, required this.text, required this.redirect, required this.colors});
+  
+  const MenuButton(
+      {super.key,
+      required this.icon,
+      required this.text,
+      required this.redirect,
+      required this.colors});
 
   @override
   Widget build(BuildContext context) {
+
+
     return Container(
-                width: 160,
-                height: 160,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: colors,
-                  )
-                ),
-                child: TextButton(
-                  onPressed: redirect,
-                  child: Text(text, style: const TextStyle(color: Color.fromARGB(230, 255, 255, 255), fontSize: 16),)
-                ),
-              );
+      width: MediaQuery.of(context).size.width * 0.41,
+      height: 160,
+      decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: colors,
+          )),
+      child: TextButton(
+          onPressed: redirect,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              icon,
+              const SizedBox(height: 6),
+              Text(
+                textAlign: TextAlign.center,
+                text,
+                style: const TextStyle(
+                    color: Color.fromARGB(230, 255, 255, 255), fontSize: 18),
+              ),
+            ],
+          )),
+    );
   }
 }

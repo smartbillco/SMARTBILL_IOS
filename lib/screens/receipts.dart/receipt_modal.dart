@@ -83,7 +83,7 @@ class _BillDetailScreenState extends State<BillDetailScreen> {
           ),
         ) :
         Container(
-          padding: const EdgeInsets.symmetric(vertical: 50, horizontal: 45),
+          padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 30),
           decoration: const BoxDecoration(
             color: Colors.white,
             borderRadius:BorderRadius.all(Radius.circular(15))
@@ -106,14 +106,13 @@ class _BillDetailScreenState extends State<BillDetailScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   ReceiptRows(type: "Cliente", value: widget.receipt['customer'].toUpperCase()),
-                  ReceiptRows(type: "Id Cliente", value: widget.receipt['customer_id'].toUpperCase()),
-                  ReceiptRows(type: "Identificación", value: widget.receipt['company'].toUpperCase()),
+                  ReceiptRows(type: "Identificación", value: widget.receipt['customer_id'].toUpperCase()),
                   ReceiptRows(type: "Compañia", value: widget.receipt['company_id']),
                   ReceiptRows(type: "Fecha", value: widget.receipt['date']),
                   ReceiptRows(type: "Hora", value: widget.receipt['time']),
-                  ReceiptRows(type: "Precio", value: NumberFormat('#,##0', 'en_US').format(double.parse(widget.receipt['price'])).toString()),
-                  ReceiptRows(type: "No Factura", value: widget.receipt['cufe']),
+                  ReceiptRows(type: "Precio", value: "${widget.receipt['currency']} ${NumberFormat('#,##0', 'en_US').format(double.parse(widget.receipt['price'])).toString()}"),
                   ReceiptRows(type: "Ciudad", value: widget.receipt['city']),
+                  ReceiptRows(type: "Código", value: widget.receipt['cufe']),
                   const SizedBox(height: 15,),
                   Center(
                     child: ElevatedButton(
@@ -156,11 +155,12 @@ class ReceiptRows extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("$type     ", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-            Flexible(child: Text(value, softWrap: true, )),
+            Text(type, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            const SizedBox(width: 5),
+            Flexible(child: Text(value ?? "No encontrado", softWrap: true, )),
           ],
         ),
-        const SizedBox(height: 7,)
+        const SizedBox(height: 7)
       ]
        
     );

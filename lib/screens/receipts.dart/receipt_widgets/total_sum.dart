@@ -4,7 +4,8 @@ import 'package:intl/intl.dart';
 class TotalSumWidget extends StatefulWidget {
   final double totalColombia;
   final double totalPeru;
-  const TotalSumWidget({super.key, required this.totalColombia, required this.totalPeru});
+  final double totalPanama;
+  const TotalSumWidget({super.key, required this.totalColombia, required this.totalPeru, required this.totalPanama});
 
   @override
   State<TotalSumWidget> createState() => _TotalSumWidgetState();
@@ -15,7 +16,7 @@ class _TotalSumWidgetState extends State<TotalSumWidget> {
   Widget build(BuildContext context) {
     return Container(
               padding: const EdgeInsets.all(20),
-              height: 180,
+              height: 220,
               width: MediaQuery.of(context).size.width,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(15),
@@ -33,6 +34,8 @@ class _TotalSumWidgetState extends State<TotalSumWidget> {
                       Text("\$${NumberFormat('#,##0', 'en_US').format(widget.totalColombia).toString()}", style: const TextStyle(color: Colors.white,fontSize: 32, fontWeight: FontWeight.w600),),
                       const SizedBox(height:2),
                       Text("S/.${NumberFormat('#,##0', 'en_US').format(widget.totalPeru).toString()}", style: const TextStyle(color: Colors.white,fontSize: 32, fontWeight: FontWeight.w600),),
+                      const SizedBox(height:2),
+                      Text("USD ${NumberFormat('#,##0.00', 'en_US').format(widget.totalPanama).toString()}", style: const TextStyle(color: Colors.white,fontSize: 32, fontWeight: FontWeight.w600),),
                     ] 
                   ),
                 ],
