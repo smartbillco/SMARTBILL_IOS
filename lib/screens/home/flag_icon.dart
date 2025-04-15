@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:smartbill/screens/models/country.dart';
+import 'package:smartbill/models/country.dart';
 
 class FlagIcon extends StatefulWidget {
   final Function(Country) changeFlag;

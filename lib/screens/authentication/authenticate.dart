@@ -24,15 +24,14 @@ class _AuthenticateScreenState extends State<AuthenticateScreen> {
 
   //Snackbar in cade of error phone
   void _showSnackbarEmptyPhone() {
-    const snackbar = SnackBar(content: Text("Ingresa tu número"), duration: Duration(seconds: 2));
+    const snackbar = SnackBar(content: Text("Ingresa tu número"), duration: Duration(seconds: 3));
 
     ScaffoldMessenger.of(context).showSnackBar(snackbar);
   }
 
   //Snackbar invalid phone number
   void _showSnackbarcInvalidPhone() {
-    const snackbar = SnackBar(content: Text("Número invalido"), duration: Duration(seconds: 2));
-
+    const snackbar = SnackBar(content: Text("Número invalido"), duration: Duration(seconds: 3));
     ScaffoldMessenger.of(context).showSnackBar(snackbar);
     
   }
@@ -46,41 +45,45 @@ class _AuthenticateScreenState extends State<AuthenticateScreen> {
       isLoading = true;
     });
 
-    fullphone = dropdownvalue + _phoneText.text.trim();
+    try {
 
-    FocusScope.of(context).unfocus();
+      fullphone = dropdownvalue + _phoneText.text.trim();
 
-    if (_phoneText.text.trim() == "") {     
+      FocusScope.of(context).unfocus();
 
-      _showSnackbarEmptyPhone();
 
+      if (_phoneText.text.trim() == "") {     
+
+        _showSnackbarEmptyPhone();
+
+      } else { 
+
+        await _auth.verifyPhone(context: context, phone: fullphone, codeSentCallback: (verificationId) {
+              
+              _verificationId = verificationId;
+              
+              Navigator.push(context, MaterialPageRoute( builder: (context) => OtpScreen(code: _verificationId)));
+            },
+            codeErrorCallback: (message) {
+              _showSnackbarcInvalidPhone();
+
+            });
+
+            await Future.delayed(Duration(seconds: 3));
+      }
+    }
+    catch(e) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Hubo un error, por favor intentelo mas tarde")));
+
+    } finally {
       setState(() {
         isLoading = false;
       });
-
-    } else {
-
-      await _auth.verifyPhone(context: context, phone: fullphone, codeSentCallback: (verificationId) {
-
-            setState(() {
-              _verificationId = verificationId;
-            });
-
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => OtpScreen(code: _verificationId)));
-          },
-          codeErrorCallback: (message) {
-            _showSnackbarcInvalidPhone();
-
-            setState(() {
-              isLoading = false;
-            });
-
-          });
-
     }
+
+    
+
+    
     
   }
 
@@ -145,7 +148,9 @@ class _AuthenticateScreenState extends State<AuthenticateScreen> {
             const SizedBox(height: 38),
 
             //Submit button
-            isLoading ? const CircularProgressIndicator() : SizedBox(
+            isLoading 
+            ? const CircularProgressIndicator() 
+            : SizedBox(
               height: 50,
               width: MediaQuery.of(context).size.width - 80,
               child: ElevatedButton(

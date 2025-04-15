@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:smartbill/models/pdf_reader.dart';
 import 'package:smartbill/screens/receipts.dart/receipt_screen.dart';
 import 'package:smartbill/services/pdf.dart';
 import 'package:smartbill/services/xml/xml.dart';
@@ -14,6 +17,7 @@ class AddBillChoice extends StatefulWidget {
 class _AddBillChoiceState extends State<AddBillChoice> {
   final Xmlhandler xmlhandler = Xmlhandler();
   final PdfHandler pdfHandler = PdfHandler();
+  final PdfService pdfService = PdfService();
 
   //Snackbar for receipt cancel
   //Cancelled picking a xml file
@@ -52,13 +56,13 @@ class _AddBillChoiceState extends State<AddBillChoice> {
 
     if (fileResult != null) {
       String filePath = fileResult.files.single.path!;
-      String fileName = fileResult.files.single.name.toLowerCase();
+      File pdfFile = File(filePath);
+      //String fileName = fileResult.files.single.name.toLowerCase();
 
-       if (fileName.endsWith('.pdf')) {
-        await pdfHandler.getPDFtext(filePath);
+      await pdfService.fetchPdfExtractor(pdfFile);
 
-        Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => const ReceiptScreen()));
-      }
+      Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => const ReceiptScreen()));
+      
     } else {
       print("Se cancelo");
       _showSnackbarCancelXml();
@@ -79,37 +83,37 @@ class _AddBillChoiceState extends State<AddBillChoice> {
           children: [
             Card(
               elevation: 4,
-              margin: EdgeInsets.symmetric(vertical: 8),
+              margin: const EdgeInsets.symmetric(vertical: 8),
               child: ListTile(
                 onTap: _pickAndDisplayXMLFile,
-                contentPadding: EdgeInsets.all(10),
-                leading: Icon(Icons.code, color: Colors.orange, size: 28),
-                title: Text("Subir archivo XML"),
-                trailing: Icon(Icons.arrow_forward_ios, color: Colors.grey),
+                contentPadding: const EdgeInsets.all(10),
+                leading: const Icon(Icons.code, color: Colors.orange, size: 28),
+                title: const Text("Subir archivo XML"),
+                trailing: const Icon(Icons.arrow_forward_ios, color: Colors.grey),
               ),
             ),
             Card(
               elevation: 4,
-              margin: EdgeInsets.symmetric(vertical: 8),
+              margin: const EdgeInsets.symmetric(vertical: 8),
               child: ListTile(
                 onTap: _pickAndDisplayPDFFile,
-                contentPadding: EdgeInsets.all(10),
-                leading: Icon(Icons.picture_as_pdf, color: Colors.red, size: 28),
-                title: Text("Subir archivo PDF"),
-                trailing: Icon(Icons.arrow_forward_ios, color: Colors.grey),
+                contentPadding: const EdgeInsets.all(10),
+                leading: const Icon(Icons.picture_as_pdf, color: Colors.red, size: 28),
+                title: const Text("Subir archivo PDF"),
+                trailing: const Icon(Icons.arrow_forward_ios, color: Colors.grey),
               ),
             ),
             Card(
               elevation: 4,
-              margin: EdgeInsets.symmetric(vertical: 8),
+              margin: const EdgeInsets.symmetric(vertical: 8),
               child: ListTile(
                 onTap: () {
 
                 },
-                contentPadding: EdgeInsets.all(10),
-                leading: Icon(Icons.image, color: Colors.green, size: 28),
-                title: Text("Subir imagen de factura"),
-                trailing: Icon(Icons.arrow_forward_ios, color: Colors.grey),
+                contentPadding: const EdgeInsets.all(10),
+                leading: const Icon(Icons.image, color: Colors.green, size: 28),
+                title: const Text("Subir imagen de factura"),
+                trailing: const Icon(Icons.arrow_forward_ios, color: Colors.grey),
               ),
             )
           ],

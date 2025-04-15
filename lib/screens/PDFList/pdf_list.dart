@@ -5,7 +5,7 @@ import 'package:open_filex/open_filex.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdfx/pdfx.dart';
 import 'package:read_pdf_text/read_pdf_text.dart';
-import 'package:smartbill/screens/filter/filter.dart';
+import 'package:smartbill/screens/PDFList/filter/filter.dart';
 import 'package:smartbill/services/pdf.dart';
 
 class PDFListScreen extends StatefulWidget {

@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:smartbill/screens/expenses/add_expenses_widgets/add_expense_form.dart';
-import 'package:smartbill/screens/expenses/add_income_widgets/add_income_form.dart';
-import 'package:smartbill/screens/expenses/balance_container.dart';
-import 'package:smartbill/services/db.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:intl/intl.dart';
+import 'package:smartbill/screens/expenses/expenses_screens/expenses_all.dart';
+import 'package:smartbill/screens/expenses/expenses_screens/expenses_today.dart';
+import 'package:smartbill/screens/expenses/expenses_screens/expenses_week.dart';
 
 class ExpensesScreen extends StatefulWidget {
   const ExpensesScreen({super.key});
@@ -13,89 +10,19 @@ class ExpensesScreen extends StatefulWidget {
 }
 
 class _ExpensesScreenState extends State<ExpensesScreen> {
-  DatabaseConnection databaseConnection = DatabaseConnection();
-  User? user = FirebaseAuth.instance.currentUser;
-  double total = 0;
-  List transactions = [];
+  int _currentIndex = 0;
+  List<Widget> _bottomItemsList = [
+    ExpensesToday(),
+    ExpensesWeek(),
+    ExpensesAll(),
+  ];
 
-
-  void _redirectToAddIncomeForm() {
-    Navigator.push(context, MaterialPageRoute(builder: (context) => const AddIncomeForm()));  
-  }
-
-  void _redirectToAddExpensesForm() {
-    Navigator.push(context, MaterialPageRoute(builder: (context) => const AddExpensesForm()));  
-  }
-
-
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    getAllTransactions();
-  }
-
-  Future<void> getAllTransactions() async {
-    var db = await databaseConnection.openDb();
-    double totalSum = 0;
-    double totalSubs = 0;
-
-    var result = await db.query('transactions', where: 'userId = ?', whereArgs: [user!.uid], orderBy: 'date DESC');
-    print("Transactions: $result");
-
-    for(var transaction in result) {
-      String transactionAmount = transaction['amount'].toString().replaceAll(',', '');
-      if(transaction['type'] == 'income') {
-        totalSum += double.parse(transactionAmount);
-      } else if (transaction['type'] == 'expense') {
-        totalSubs += double.parse(transactionAmount);
-      }
-      
-    }
-
+  void _onTap(int index) {
     setState(() {
-      transactions = result;
-      total = totalSum - totalSubs;
+      _currentIndex = index;
     });
+
   }
-
-  //Delete transaction
-  Future<void> deleteRegister(int id) async {
-    var db = await databaseConnection.openDb();
-    await db.delete(
-      'transactions', // table name
-      where: '_id = ?',
-      whereArgs: [id],
-    );
-  }
-
-
-  //Show delete dialog
-  void _showDeleteDialog(BuildContext context, int id, VoidCallback onDeleted) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Eliminar transacción'),
-        content: Text('Está seguro de que desea eliminar esta transacción?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context), // Close dialog
-            child: Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () async {
-              await deleteRegister(id);
-              Navigator.pop(context); // Close dialog
-              onDeleted(); // Optional callback to refresh list
-            },
-            child: Text('Eliminar', style: TextStyle(color: Colors.red)),
-          ),
-        ],
-      ),
-    );
-  }
-
 
 
   @override
@@ -104,69 +31,24 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
       appBar: AppBar(
         title: const Text("Agregar ingreso"),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          children: [
-            BalanceContainer(balance: NumberFormat("#,##0.00").format(total).toString()),
-            const SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ElevatedButton.icon(
-                  style: const ButtonStyle(backgroundColor: WidgetStatePropertyAll(Colors.green)),
-                  onPressed: _redirectToAddIncomeForm,
-                  label: const Text('Ingreso', style: TextStyle(color: Colors.white),),
-                  icon: const Icon(Icons.add_rounded, color: Colors.white)
-                ),
-                const SizedBox(width: 10),
-                ElevatedButton.icon(
-                  style: const ButtonStyle(backgroundColor: WidgetStatePropertyAll(Colors.redAccent)),
-                  onPressed: _redirectToAddExpensesForm,
-                  label: const Text('Gastos', style: TextStyle(color: Colors.white)),
-                  icon: const Icon(Icons.remove, color: Colors.white)
-                )
-              ]
-            ),
-            const SizedBox(height: 30),
-            transactions.isEmpty
-            ? const Text("Agrega tu primer ingreso!", style: TextStyle(color: Colors.black54, fontSize: 18),)
-            : Expanded(
-              child: ListView.builder(
-                itemCount: transactions.length,
-                itemBuilder:(context, index) {
-                  return Card(
-                    elevation: 4,
-                    child: ListTile(
-                      onLongPress: () {
-                        _showDeleteDialog(context, transactions[index]['_id'], () {
-                        // You could refresh state here using setState in a StatefulWidget
-                        getAllTransactions();
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Eliminado: ${transactions[index]['description']}')));
-                        });
-                      },
-                      leading: const Icon(Icons.attach_money, color: Colors.green, size:25),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-                      title: Text(transactions[index]['description'].toUpperCase(), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text("${transactions[index]['category']}", style: const TextStyle(fontSize: 14)),
-                          Text("${transactions[index]['date']}", style: const TextStyle(fontSize: 14)),
-                        ],
-                      ),
-                      trailing: Text("${NumberFormat("#,##0.00").format(transactions[index]['amount']).toString()}", style: 
-                      transactions[index]['type'] == 'income' 
-                      ? const TextStyle(fontSize: 15, color: Colors.green, fontWeight: FontWeight.bold)
-                      : const TextStyle(fontSize: 15, color: Colors.red, fontWeight: FontWeight.bold)
-                      )
-                    ),
-                  );
-                },
-              ),
-            ),
-          ],
-        )
+      body: _bottomItemsList[_currentIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _currentIndex,
+        onTap: _onTap,
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.calendar_today),
+            label: 'Hoy'
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.calendar_view_week),
+            label: '7 dias'
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.calendar_month ),
+            label: 'Todos'
+          )
+        ]
       ),
     );
   }

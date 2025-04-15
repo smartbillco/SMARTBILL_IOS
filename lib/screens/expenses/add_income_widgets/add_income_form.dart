@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:smartbill/screens/expenses/expenses.dart';
 import 'package:smartbill/screens/expenses/number_formatter.dart';
 import 'package:smartbill/models/transaction.dart';
@@ -15,6 +16,7 @@ class _AddIncomeFormState extends State<AddIncomeForm> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _incomeController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
+  final TextEditingController _dateController = TextEditingController();
   String userId = FirebaseAuth.instance.currentUser!.uid;
   String? _selectedCategory;
   DateTime? _selectedDate;
@@ -31,6 +33,7 @@ class _AddIncomeFormState extends State<AddIncomeForm> {
     if (pickedDate != null) {
       setState(() {
         _selectedDate = pickedDate;
+        _dateController.text = DateFormat('dd/MM/yyyy').format(pickedDate);
       });
     }
   }
@@ -38,7 +41,7 @@ class _AddIncomeFormState extends State<AddIncomeForm> {
 
   Future<void> _createNewTransaction() async {
     
-    String date = "${_selectedDate!.day}-${_selectedDate!.month}-${_selectedDate!.year}";
+    String date = DateFormat('yyyy-MM-dd').format(_selectedDate!);
     String formattedAmount = _incomeController.text.replaceAll(',', '');
 
     double amount = double.parse(formattedAmount);
@@ -113,12 +116,11 @@ class _AddIncomeFormState extends State<AddIncomeForm> {
                   ),
                   const SizedBox(height: 16),
                   TextFormField(
+                    controller: _dateController,
                     readOnly: true,
-                    decoration: InputDecoration(
-                      labelText: _selectedDate == null
-                          ? "Selecciona fecha"
-                          : "Date: ${_selectedDate!.toLocal()}".split(' ')[0],
-                      suffixIcon: const Icon(Icons.calendar_today),
+                    decoration: const InputDecoration(
+                      labelText: 'Selecciona fecha',
+                      suffixIcon: Icon(Icons.calendar_today),
                     ),
                     onTap: () => _pickDate(context),
                   ),

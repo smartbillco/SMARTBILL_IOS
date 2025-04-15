@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:intl/intl.dart';
 import 'package:smartbill/models/transaction.dart';
 import 'package:smartbill/screens/expenses/expenses.dart';
 import 'package:smartbill/screens/expenses/number_formatter.dart';
@@ -13,8 +14,9 @@ class AddExpensesForm extends StatefulWidget {
 
 class _AddExpensesFormState extends State<AddExpensesForm> {
   final _formKey = GlobalKey<FormState>();
-  TextEditingController _expenseController = TextEditingController();
-  TextEditingController _descriptionController = TextEditingController();
+  final TextEditingController _expenseController = TextEditingController();
+  final TextEditingController _descriptionController = TextEditingController();
+  final TextEditingController _dateController = TextEditingController();
   String? _selectedCategory;
   DateTime? _selectedDate;
   String userId = FirebaseAuth.instance.currentUser!.uid;
@@ -30,6 +32,7 @@ class _AddExpensesFormState extends State<AddExpensesForm> {
     if (pickedDate != null) {
       setState(() {
         _selectedDate = pickedDate;
+        _dateController.text = DateFormat('dd/MM/yyyy').format(pickedDate);
       });
     }
   }
@@ -37,7 +40,7 @@ class _AddExpensesFormState extends State<AddExpensesForm> {
 
   Future<void> _createNewTransaction() async {
     
-    String date = "${_selectedDate!.day}-${_selectedDate!.month}-${_selectedDate!.year}";
+    String date = DateFormat('yyyy-MM-dd').format(_selectedDate!);
     String formattedAmount = _expenseController.text.replaceAll(',', '');
 
     double amount = double.parse(formattedAmount);
@@ -113,12 +116,12 @@ class _AddExpensesFormState extends State<AddExpensesForm> {
                   ),
                   const SizedBox(height: 16),
                   TextFormField(
+                    controller: _dateController,
                     readOnly: true,
-                    decoration: InputDecoration(
-                      labelText: _selectedDate == null
-                          ? "Selecciona fecha"
-                          : "Date: ${_selectedDate!.toLocal()}".split(' ')[0],
-                      suffixIcon: const Icon(Icons.calendar_today),
+                    decoration: const InputDecoration(
+                      hintText: 'Fecha',
+                      labelText: 'Selecciona fecha',
+                      suffixIcon: Icon(Icons.calendar_today),
                     ),
                     onTap: () => _pickDate(context),
                   ),

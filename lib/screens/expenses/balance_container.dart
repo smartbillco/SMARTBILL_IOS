@@ -13,7 +13,7 @@ class _BalanceContainerState extends State<BalanceContainer> {
   Widget build(BuildContext context) {
     return Container(
         padding: const EdgeInsets.all(20),
-        height: 160,
+        height: 140,
         width: MediaQuery.of(context).size.width,
         decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(15),
