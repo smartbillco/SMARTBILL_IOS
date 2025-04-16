@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:smartbill/models/pdf_reader.dart';
+import 'package:smartbill/services/pdf_reader.dart';
 import 'package:smartbill/screens/receipts.dart/receipt_screen.dart';
 import 'package:smartbill/services/pdf.dart';
 import 'package:smartbill/services/xml/xml.dart';
