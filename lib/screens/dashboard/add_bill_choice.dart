@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:smartbill/services/pdf_reader.dart';
@@ -18,6 +17,7 @@ class _AddBillChoiceState extends State<AddBillChoice> {
   final Xmlhandler xmlhandler = Xmlhandler();
   final PdfHandler pdfHandler = PdfHandler();
   final PdfService pdfService = PdfService();
+  bool isImageWorking = false;
 
   //Snackbar for receipt cancel
   //Cancelled picking a xml file
@@ -45,7 +45,7 @@ class _AddBillChoiceState extends State<AddBillChoice> {
         Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => const ReceiptScreen()));
       }
     } else {
-      print("Se cancelo");
+      print("Se canceló");
       _showSnackbarCancelXml();
     }
   }
@@ -55,13 +55,25 @@ class _AddBillChoiceState extends State<AddBillChoice> {
     FilePickerResult? fileResult = await FilePicker.platform.pickFiles(type: FileType.custom, allowedExtensions: ['pdf']);
 
     if (fileResult != null) {
-      String filePath = fileResult.files.single.path!;
-      File pdfFile = File(filePath);
-      //String fileName = fileResult.files.single.name.toLowerCase();
 
-      await pdfService.fetchPdfExtractor(pdfFile);
+      try {
+        String filePath = fileResult.files.single.path!;
+        File pdfFile = File(filePath);
+        //String fileName = fileResult.files.single.name.toLowerCase();
 
-      Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => const ReceiptScreen()));
+        await pdfService.saveExtractedText(pdfFile);
+
+        Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => const ReceiptScreen()));
+
+      } catch(e) {
+        
+        print("ERROR saving pdf: $e");
+
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Parece que la factura ya existe.")));
+
+        Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => const ReceiptScreen()));
+      }
+      
       
     } else {
       print("Se cancelo");
@@ -103,7 +115,9 @@ class _AddBillChoiceState extends State<AddBillChoice> {
                 trailing: const Icon(Icons.arrow_forward_ios, color: Colors.grey),
               ),
             ),
-            Card(
+
+            isImageWorking
+            ? Card(
               elevation: 4,
               margin: const EdgeInsets.symmetric(vertical: 8),
               child: ListTile(
@@ -116,6 +130,7 @@ class _AddBillChoiceState extends State<AddBillChoice> {
                 trailing: const Icon(Icons.arrow_forward_ios, color: Colors.grey),
               ),
             )
+            : const SizedBox.shrink()
           ],
         ) 
       ),

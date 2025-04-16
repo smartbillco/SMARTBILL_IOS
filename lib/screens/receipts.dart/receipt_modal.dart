@@ -109,9 +109,10 @@ class _BillDetailScreenState extends State<BillDetailScreen> {
                   ReceiptRows(type: "Identificación", value: widget.receipt['customer_id'].toUpperCase()),
                   ReceiptRows(type: "Compañia", value: widget.receipt['company_id']),
                   ReceiptRows(type: "Fecha", value: widget.receipt['date']),
-                  ReceiptRows(type: "Hora", value: widget.receipt['time']),
-                  ReceiptRows(type: "Precio", value: "${widget.receipt['currency']} ${NumberFormat('#,##0', 'en_US').format(double.parse(widget.receipt['price'])).toString()}"),
-                  ReceiptRows(type: "Ciudad", value: widget.receipt['city']),
+                  widget.receipt['iva'] != null
+                  ? ReceiptRows(type: "IVA", value:  NumberFormat('#,##0', 'en_US').format(double.parse(widget.receipt['iva'])).toString())
+                  : SizedBox.shrink(),
+                  ReceiptRows(type: "Precio", value: NumberFormat('#,##0', 'en_US').format(double.parse(widget.receipt['price'])).toString()),
                   ReceiptRows(type: "Código", value: widget.receipt['cufe']),
                   const SizedBox(height: 15,),
                   Center(

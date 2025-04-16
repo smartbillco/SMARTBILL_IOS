@@ -15,9 +15,7 @@ class XmlPanama extends Xmlhandler {
       'company_id': xml.findAllElements('dRuc').first.innerText,
       'price': xml.findAllElements('dVTotItems').first.innerText,
       'cufe': xml.findAllElements('dId').first.innerText,
-      'city': "${xml.findAllElements('dCodUbi').first.innerText}, ${xml.findAllElements('dCorreg').first.innerText} , ${xml.findAllElements('dDistr').first.innerText}",
       'date': xml.findAllElements('dFechaFab').first.innerText,
-      'time': '0:00',
       'currency': 'USD',
     };
 

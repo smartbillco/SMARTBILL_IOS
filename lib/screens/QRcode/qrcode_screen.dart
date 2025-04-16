@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:smartbill/services/colombian_bill.dart';
 import 'package:smartbill/services/pdf.dart';
 import 'package:smartbill/services/peruvian_bill.dart';
@@ -119,9 +120,9 @@ Widget _cardColombia(Map pdfContent, context, Future<void> Function() saveFuncti
             const SizedBox(height: 10),
             _buildRow("NIT", pdfContent['nit']),
             _buildRow("Id Clientes", pdfContent['customer_id']),
-            _buildRow("Sin IVA", pdfContent['amount_before_iva']),
-            _buildRow("IVA", pdfContent['iva']),
-            _buildRow("Pago", pdfContent['total_amount']),
+            _buildRow("Sin IVA", NumberFormat('#,##0', 'en_US').format(double.parse(pdfContent['amount_before_iva'])).toString()),
+            _buildRow("IVA", NumberFormat('#,##0', 'en_US').format(double.parse(pdfContent['iva'])).toString()),
+            _buildRow("Pago", NumberFormat('#,##0', 'en_US').format(double.parse(pdfContent['total_amount'])).toString()),
             _buildRow("Fecha", pdfContent['date']),
             _buildRow("Hora", pdfContent['time']),
             _buildRow("CUFE", pdfContent['cufe']),

@@ -5,7 +5,7 @@ import 'package:smartbill/screens/receipts.dart/receipt_widgets/delete_dialog.da
 import 'package:smartbill/screens/receipts.dart/receipt_widgets/searchbar.dart';
 import 'package:smartbill/screens/receipts.dart/receipt_widgets/total_sum.dart';
 import 'package:smartbill/services/colombian_bill.dart';
-import 'package:smartbill/services/pdf.dart';
+import 'package:smartbill/services/pdf_reader.dart';
 import 'package:smartbill/services/peruvian_bill.dart';
 import 'package:smartbill/services/xml/xml.dart';
 import 'package:smartbill/services/xml/xml_colombia.dart';
@@ -30,7 +30,7 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
   final XmlPeru xmlPeru = XmlPeru();
   final XmlPanama xmlPanama = XmlPanama();
   final Xmlhandler xmlhandler = Xmlhandler();
-  final PdfHandler pdfHandler = PdfHandler();
+  final PdfService _pdfService = PdfService();
 
   //Handling sums
   double totalColombia = 0;
@@ -42,11 +42,13 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
   //Get all XML files from sqlite
   void getReceipts() async {
     var xmlFiles = await xmlhandler.getXmls();
-    var pdfFiles = await pdfHandler.getPdfs();
+    var pdfFiles = await _pdfService.fetchAllPdfs();
     List myFiles = [];
     double totalPaidColombia = 0;
     double totalPaidPeru = 0;
     double totalPaidPanama = 0;
+
+   
 
 
     for (var item in xmlFiles) {
@@ -93,9 +95,20 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
 
     for(var item in pdfFiles) {
 
-      Map<String, dynamic> newPdf = pdfHandler.extractInfoFromPdf(item['pdf_text'], item['_id']);
+      Map<String, dynamic> newPdf = {
+        '_id': item['_id'],
+        'id_bill': item['cufe'],
+        'customer': 'Cliente',
+        'customer_id': 'Factura PDF',
+        'company': item['nit'],
+        'company_id': item['nit'],
+        'price': item['total_amount'].toString(),
+        'cufe': item['cufe'],
+        'date': item['date'],
+        'currency': 'PDF'
+      };
 
-      totalPaidColombia += double.parse(newPdf['price']);
+      totalPaidColombia += item['total_amount'];
 
       myFiles.add(newPdf);
 
@@ -144,7 +157,7 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
         title: const Text("Mis recibos"),
       ),
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 20),
+        padding: const EdgeInsets.fromLTRB(15, 20, 15, 42),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
@@ -219,7 +232,7 @@ class _ListReceiptsState extends State<ListReceipts> {
         children: [
           Text(widget.fileContent[widget.index]['company'], style: const TextStyle(fontSize: 18)),
           Text(widget.fileContent[widget.index]['company_id'], style: const TextStyle(fontSize: 16)),
-          Text('${widget.fileContent[widget.index]['currency']}: ${NumberFormat('#,##0.00', 'en_US').format(double.parse(widget.fileContent[widget.index]['price']))}', style: const TextStyle(fontSize: 16)),
+          Text(NumberFormat('#,##0.00', 'en_US').format(double.parse(widget.fileContent[widget.index]['price'])), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
         ]
       ),
       trailing:  IconButton(

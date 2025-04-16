@@ -43,13 +43,7 @@ class XmlColombia extends Xmlhandler {
             .toList()
             .last
             .innerText,
-        'city': xmlCData
-            .findAllElements('cbc:CityName')
-            .toList()
-            .last
-            .innerText,
         'date': parsedDoc['cbc:IssueDate']['text'],
-        'time': parsedDoc['cbc:IssueTime']['text'],
         'currency': 'COP'
 
     };

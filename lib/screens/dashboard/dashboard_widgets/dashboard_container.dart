@@ -20,6 +20,7 @@ class DashboardContainer extends StatefulWidget {
 class _DashboardContainerState extends State<DashboardContainer> {
   final Xmlhandler xmlhandler = Xmlhandler();
   final PdfHandler pdfHandler = PdfHandler();
+  bool isImageReceiptWorking = false;
 
   //redirect to receiptslist
   void redirectToScreen(Widget screen) {
@@ -51,17 +52,19 @@ class _DashboardContainerState extends State<DashboardContainer> {
                     Color.fromARGB(255, 126, 126, 126),
                     Color.fromARGB(255, 31, 31, 31)
                   ]),
+
               MenuButton(
-                icon: Icon(Icons.camera_alt, color: Colors.white, size: 35),
-                text: "Fotografíar Factura",
+                icon: Icon(Icons.receipt, color: Colors.white, size: 35),
+                text: "Mis facturas",
                 redirect: () {
-                  redirectToScreen(const CameraShotScreen());
+                  redirectToScreen(const ReceiptScreen());
                 },
                 colors: const [
-                  Color.fromARGB(255, 20, 82, 175),
+                Color.fromARGB(255, 20, 82, 175),
                   Color.fromARGB(255, 4, 34, 80)
-                ])
-            ],
+                ]
+              ),
+            ]
           ),
           const SizedBox(height: 14),
 
@@ -70,7 +73,7 @@ class _DashboardContainerState extends State<DashboardContainer> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               MenuButton(
-                icon: Icon(Icons.upload, color: Colors.white, size: 35),
+                icon: const Icon(Icons.upload, color: Colors.white, size: 35),
                 text: "Cargar factura",
                 redirect: () {Navigator.push(context, MaterialPageRoute(builder: (context) => const AddBillChoice()));},
                 colors: const [
@@ -78,7 +81,7 @@ class _DashboardContainerState extends State<DashboardContainer> {
                   Color.fromARGB(255, 15, 4, 80)
                 ]),
               MenuButton(
-                icon: Icon(Icons.qr_code, color: Colors.white, size: 35),
+                icon: const Icon(Icons.qr_code, color: Colors.white, size: 35),
                 text: "Escanear QR",
                 redirect: () {
                   redirectToScreen(const QRScanner());
@@ -95,16 +98,6 @@ class _DashboardContainerState extends State<DashboardContainer> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              MenuButton(
-                icon: Icon(Icons.receipt, color: Colors.white, size: 35),
-                text: "Mis facturas",
-                redirect: () {
-                  redirectToScreen(const ReceiptScreen());
-                },
-                colors: const [
-                  Color.fromARGB(255, 250, 229, 44),
-                   Color.fromARGB(255, 196, 153, 12)
-                ]),
               phone!.startsWith('+57')
               ? MenuButton(
                 icon: Icon(Icons.picture_as_pdf_outlined, color: Colors.white, size: 35),
@@ -124,6 +117,18 @@ class _DashboardContainerState extends State<DashboardContainer> {
     );
   }
 }
+
+// MenuButton(
+//     icon: Icon(Icons.camera_alt, color: Colors.white, size: 35),
+//     text: "Fotografíar Factura",
+//     redirect: () {
+//       redirectToScreen(const CameraShotScreen());
+//     },
+//     colors: const [
+//        Color.fromARGB(255, 20, 82, 175),
+//        Color.fromARGB(255, 4, 34, 80)
+// ])
+
 
 class MenuButton extends StatelessWidget {
   final Icon icon;

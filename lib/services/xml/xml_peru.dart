@@ -31,9 +31,7 @@ class XmlPeru extends Xmlhandler {
         'company_id': parsedDoc['cac:AccountingSupplierParty']['cac:Party']['cac:PartyIdentification']['cbc:ID']['text'],
         'price': parsedDoc['cac:LegalMonetaryTotal']['cbc:PayableAmount']['text'],
         'cufe': parsedDoc['cac:Signature']['cbc:ID']['text'],
-        'city': parsedDoc['cac:AccountingSupplierParty']['cac:Party']['cac:PartyLegalEntity']['cac:RegistrationAddress']['cbc:AddressTypeCode']['text'],
         'date': parsedDoc['cbc:IssueDate']['text'],
-        'time': parsedDoc['cbc:IssueTime']['text'],
         'currency': 'PEN'
     };
 

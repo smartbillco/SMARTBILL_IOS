@@ -1,6 +1,5 @@
 import 'package:smartbill/services/db.dart';
 
-
 class Pdf {
   final int? id;
   final String cufe;
@@ -25,14 +24,13 @@ class Pdf {
 
   }
 
-
   //Turn result into Map
   Map<String, dynamic> pdfToMap() {
     final map = {
       'cufe': cufe,
       'nit': nit,
       'date': date,
-      'totalAmount': totalAmount
+      'total_amount': totalAmount
     };
     if (id != null) {
       map['id'] = id!;
@@ -40,14 +38,10 @@ class Pdf {
     return map;
   }
 
-
   //Insert into database
   Future<int> insertToDatabase() async{
     var db = await databaseConnection.openDb();
     return await db.insert('pdfs', pdfToMap());
   }
-
-
-
 
 }

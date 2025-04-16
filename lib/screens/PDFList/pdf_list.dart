@@ -209,7 +209,7 @@ String? extractTotalPrice(List<String> textList) {
         child: Column(
           children: [
             Container(
-              margin: const EdgeInsets.all(20),
+              margin: const EdgeInsets.all(15),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -247,6 +247,36 @@ String? extractTotalPrice(List<String> textList) {
 
                 return Card(
                   child: ListTile(
+                    onLongPress: () async {
+                      final confirm = await showDialog<bool>(
+                      context: context,
+                      builder: (_) => AlertDialog(
+                        title: const Text('Eliminar PDF?'),
+                        content: const Text('Está seguro que quiere eliminar el archivo?'),
+                        actions: [
+                          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancelar', style: TextStyle(color: Colors.red))),
+                          TextButton(onPressed: () => Navigator.pop(context, true), child: const Text('Eliminar', style: TextStyle(color: Colors.green))),
+                        ],
+                      ),
+                    );
+
+                    if (confirm == true) {
+                      final filePath = pdfFiles[index].path;
+                      final fileToDelete = File(filePath);
+
+                      if (await fileToDelete.exists()) {
+                        await fileToDelete.delete();
+                      }
+
+                      setState(() {
+                        pdfFiles.removeAt(index);
+                        if (index < extractedText.length) {
+                          extractedText.removeAt(index);
+                        }
+                      });
+                    }
+                      
+                    },
                     leading: pdfThumbnails[file.path] != null
                         ? Image(image: pdfThumbnails[file.path]!)
                         : const CircularProgressIndicator(),
