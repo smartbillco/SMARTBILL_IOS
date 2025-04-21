@@ -30,18 +30,25 @@ class _QrcodeScreenState extends State<QrcodeScreen> {
 
 
   void pdfFormat() {
-    if(widget.qrResult.contains(':')) {
-      setState(() {
-        isPeru = false;
-        isColombia = true;
-        pdfContent = pdfHandler.parseQrColombia(widget.qrResult);
-      });
-
-    } else if (widget.qrResult.contains('|')){
+    print(widget.qrResult);
+    if(widget.qrResult.contains('|')) {
       setState(() {
         isColombia = false;
         isPeru = true;
         pdfContent = pdfHandler.parseQrPeru(widget.qrResult);
+      });
+
+    } else if(widget.qrResult.contains('NumFac')) {
+      setState(() {
+        isPeru = false;
+        isColombia = true;
+        pdfContent = pdfHandler.parseQrColombia(widget.qrResult);
+        
+      });
+    } else {
+      setState(() {
+        isPeru = false;
+        isColombia = false;
       });
     }
 
@@ -108,7 +115,8 @@ Widget _cardColombia(Map pdfContent, context, Future<void> Function() saveFuncti
       margin: const EdgeInsets.symmetric(vertical: 40, horizontal: 20),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
+        child: 
+        Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

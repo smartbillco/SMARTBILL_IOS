@@ -6,24 +6,58 @@ class PdfHandler {
 
   //Read new Colombian QR code
   Map<String, dynamic> parseQrColombia(String qrResult) {
+
+    bool isColonAfterNumFac(String input) {
+      RegExp regex = RegExp(r'NumFac\s*([=:])');
+      final match = regex.firstMatch(input);
+      if (match != null) {
+        return match.group(1) == ':'; // true if ':', false if '='
+      }
+      return false; // or throw an error if NumFac not found
+    }
+
     try {
-      List lines = qrResult.split('\n');
-      List qrList = lines.map((item) => item.split(':').last).toList();
-      List keys = ['bill_number', 'date', 'time', 'nit', 'customer_id', 'amount_before_iva', 'iva', 'other_tax', 'total_amount', 'cufe'];
+      if(isColonAfterNumFac(qrResult)) {
+        List lines = qrResult.split('\n');
+        List qrList = lines.map((item) => item.split(':').last).toList();
+        List keys = ['bill_number', 'date', 'time', 'nit', 'customer_id', 'amount_before_iva', 'iva', 'other_tax', 'total_amount', 'cufe'];
 
-      Map<String, dynamic> qrPdf = {};
+        Map<String, dynamic> qrPdf = {};
 
-      for(var i = 0; i < keys.length; i++){
-        if(i >= qrList.length || qrList[i].trim().isEmpty) {
-          qrPdf[keys[i]] = "Vacio";
-        } else {
-          qrPdf[keys[i]] = qrList[i];
+        for(var i = 0; i < keys.length; i++){
+          if(i >= qrList.length || qrList[i].trim().isEmpty) {
+            qrPdf[keys[i]] = "Vacio2";
+          } else {
+            qrPdf[keys[i]] = qrList[i];
+          }
         }
+
+        print("Printing QR pdf $qrPdf");
+
+        return qrPdf;
+
+      } else {
+        List lines = qrResult.split('\n');
+        List qrList = lines.map((item) => item.split('=')[1].split(' ')[0]).toList();
+        List keys = ['bill_number', 'date', 'time', 'nit', 'customer_id', 'amount_before_iva', 'iva', 'other_tax', 'total_amount', 'cufe'];
+
+        Map<String, dynamic> qrPdf = {};
+
+        for(var i = 0; i < keys.length; i++){
+          if(i >= qrList.length || qrList[i].trim().isEmpty) {
+            qrPdf[keys[i]] = "Vacio";
+          } else {
+            qrPdf[keys[i]] = qrList[i];
+          }
+        }
+
+        print("Printing QR pdf $qrPdf");
+
+        return qrPdf;
+
       }
 
-      print("Printing QR pdf $qrPdf");
-
-      return qrPdf;
+      
 
     } catch(e) {
       Map<String, dynamic> error = {

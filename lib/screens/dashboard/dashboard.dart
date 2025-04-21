@@ -4,7 +4,7 @@ import 'package:smartbill/screens/dashboard/dashboard_widgets/dashboard_containe
 import 'package:smartbill/screens/deleteAccount/delete_account.dart';
 import 'package:smartbill/screens/settings/settings.dart';
 import 'package:smartbill/services/auth.dart';
-import 'package:smartbill/services/pdf.dart';
+import 'package:smartbill/services/pdf_reader.dart';
 import 'package:smartbill/services/xml/xml.dart';
 
 
@@ -18,7 +18,7 @@ class DashboardScreen extends StatefulWidget {
 class _DashboardScreenState extends State<DashboardScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final Xmlhandler xmlhandler = Xmlhandler();
-  final PdfHandler pdfHandler = PdfHandler();
+  final PdfService pdfService = PdfService();
   final AuthService _auth = AuthService();
 
   int billsAmount = 0;
@@ -34,8 +34,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
   void didChangeDependencies() {
     // TODO: implement didChangeDependencies
     super.didChangeDependencies();
-    
-      
 
   }
   
@@ -44,7 +42,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
     if(mounted) {
       var resultXmls = await xmlhandler.getXmls();
-      var resultPdfs = await pdfHandler.getPdfs();
+      var resultPdfs = await pdfService.fetchAllPdfs();
       var total = await resultXmls.length + resultPdfs.length;
 
       if(mounted) {

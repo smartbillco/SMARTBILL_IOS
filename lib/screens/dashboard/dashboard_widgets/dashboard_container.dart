@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:smartbill/screens/PDFList/pdf_list.dart';
-import 'package:smartbill/screens/camera/camera.dart';
+//import 'package:smartbill/screens/camera/camera.dart';
 import 'package:smartbill/screens/expenses/expenses.dart';
 import 'package:smartbill/screens/dashboard/add_bill_choice.dart';
 import 'package:smartbill/screens/dashboard/dashboard_widgets/dashboard_text.dart';
