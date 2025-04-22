@@ -61,7 +61,7 @@ class _PDFListScreenState extends State<PDFListScreen> {
     for (String text in pdfLines) {
       if(text.toLowerCase().contains(value.toLowerCase())) {
         if(text.length > 40) {
-          String subtring = text.substring(16, 40) + '...';
+          String subtring = '${text.substring(16, 40)}...';
           return subtring;
         }
           String subtring = text.substring(14,);
@@ -213,8 +213,8 @@ String? extractTotalPrice(List<String> textList) {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(children: [Icon(Icons.attach_money, color: Colors.green, size: 30), Text("Total: ${NumberFormat('#,##0', 'en_US').format(totalAmount)}", style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600))]),
-                  Row(children: [Icon(Icons.receipt, color: Colors.green, size: 30), Text("Facturas: $totalBills", style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w600))])
+                  Row(children: [const Icon(Icons.attach_money, color: Colors.green, size: 30), Text("Total: ${NumberFormat('#,##0', 'en_US').format(totalAmount)}", style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w600))]),
+                  Row(children: [const Icon(Icons.receipt, color: Colors.green, size: 30), Text("Facturas: $totalBills", style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w600))])
                 ]
               ),
             ),
@@ -223,7 +223,7 @@ String? extractTotalPrice(List<String> textList) {
               child: SizedBox(
                 width: 130,
                 child: ElevatedButton(
-                  style: ButtonStyle(
+                  style: const ButtonStyle(
                     side: WidgetStatePropertyAll(BorderSide(color: Colors.grey))
                   ),
                   onPressed: redirectFilter,

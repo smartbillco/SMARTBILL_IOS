@@ -43,7 +43,7 @@ class _DashboardContainerState extends State<DashboardContainer> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               MenuButton(
-                  icon: Icon(Icons.arrow_downward, color: Colors.white, size: 35),
+                  icon: const Icon(Icons.arrow_downward, color: Colors.white, size: 35),
                   text: "Agregar ingreso",
                   redirect: () {
                     redirectToScreen(const ExpensesScreen());
@@ -54,7 +54,7 @@ class _DashboardContainerState extends State<DashboardContainer> {
                   ]),
 
               MenuButton(
-                icon: Icon(Icons.receipt, color: Colors.white, size: 35),
+                icon: const Icon(Icons.receipt, color: Colors.white, size: 35),
                 text: "Mis facturas",
                 redirect: () {
                   redirectToScreen(const ReceiptScreen());
@@ -100,7 +100,7 @@ class _DashboardContainerState extends State<DashboardContainer> {
             children: [
               phone!.startsWith('+57')
               ? MenuButton(
-                icon: Icon(Icons.picture_as_pdf_outlined, color: Colors.white, size: 35),
+                icon: const Icon(Icons.picture_as_pdf_outlined, color: Colors.white, size: 35),
                 text: "PDFs DIAN",
                 redirect: () {
                   redirectToScreen(const PDFListScreen());
@@ -109,7 +109,7 @@ class _DashboardContainerState extends State<DashboardContainer> {
                   Color.fromARGB(255, 29, 148, 33),
                   Color.fromARGB(255, 10, 59, 13)
                 ])
-              : SizedBox.shrink()
+              : const SizedBox.shrink()
             ],
           )
         ],

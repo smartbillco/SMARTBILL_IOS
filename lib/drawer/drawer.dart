@@ -46,7 +46,7 @@ class _DrawerMenuState extends State<DrawerMenu> {
   }
 
   void redirectCrypto() {
-    Navigator.push(context, MaterialPageRoute(builder: (context) => CryptoListScreen()));
+    Navigator.push(context, MaterialPageRoute(builder: (context) => const CryptoListScreen()));
   }
 
   @override
@@ -81,7 +81,7 @@ class _DrawerMenuState extends State<DrawerMenu> {
                   const SizedBox(height: 25),
                   user!.displayName == null
                   ? const Text("Bievenido!", style: TextStyle(color: Colors.white, fontSize: 26))
-                  : Text("Hola, ${formatName(user!.displayName).toString()}", style: TextStyle(color: Colors.white, fontSize: 26)),
+                  : Text("Hola, ${formatName(user!.displayName).toString()}", style: const TextStyle(color: Colors.white, fontSize: 26)),
                   const SizedBox(height: 20),
                   Text(phoneNumber.toString(), style: const TextStyle(color: Colors.white, fontSize: 18)),
                   

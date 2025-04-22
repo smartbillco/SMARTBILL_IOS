@@ -8,7 +8,7 @@ class TimeDivider extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Expanded(
+        const Expanded(
           child: Divider(
             color: Colors.grey,
             thickness: 1,
@@ -22,7 +22,7 @@ class TimeDivider extends StatelessWidget {
             fontWeight: FontWeight.bold,
           ),
         ),
-        Expanded(
+        const Expanded(
           child: Divider(
             color: Colors.grey,
             thickness: 1,

@@ -111,7 +111,7 @@ class _BillDetailScreenState extends State<BillDetailScreen> {
                   ReceiptRows(type: "Fecha", value: widget.receipt['date']),
                   widget.receipt['iva'] != null
                   ? ReceiptRows(type: "IVA", value:  NumberFormat('#,##0', 'en_US').format(double.parse(widget.receipt['iva'])).toString())
-                  : SizedBox.shrink(),
+                  : const SizedBox.shrink(),
                   ReceiptRows(type: "Precio", value: NumberFormat('#,##0', 'en_US').format(double.parse(widget.receipt['price'])).toString()),
                   ReceiptRows(type: "Código", value: widget.receipt['cufe']),
                   const SizedBox(height: 15,),

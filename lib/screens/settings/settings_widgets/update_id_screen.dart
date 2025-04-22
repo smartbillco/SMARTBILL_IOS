@@ -50,7 +50,7 @@ class _UpdateIdScreenState extends State<UpdateIdScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Actualizar ID"),
+        title: const Text("Actualizar ID"),
       ),
       body: Padding(
         padding: const EdgeInsets.all(35),
@@ -73,7 +73,7 @@ class _UpdateIdScreenState extends State<UpdateIdScreen> {
                 ),
                 onPressed: _changeDocumentId,
                 child: isLoading
-                ? CircularProgressIndicator()
+                ? const CircularProgressIndicator()
                 : const Text("Enviar", style: TextStyle(color: Colors.white, fontSize: 16),)
               ),
             )

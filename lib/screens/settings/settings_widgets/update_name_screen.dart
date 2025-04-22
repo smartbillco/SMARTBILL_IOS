@@ -53,7 +53,7 @@ class _UpdateNameScreenState extends State<UpdateNameScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Actualizar nombre"),
+        title: const Text("Actualizar nombre"),
       ),
       body: Padding(
         padding: const EdgeInsets.all(35),
@@ -83,7 +83,7 @@ class _UpdateNameScreenState extends State<UpdateNameScreen> {
                 ),
                 onPressed: _updateName,
                 child: isLoading
-                ? CircularProgressIndicator()
+                ? const CircularProgressIndicator()
                 : const Text("Enviar", style: TextStyle(color: Colors.white, fontSize: 16),)
               ),
             )

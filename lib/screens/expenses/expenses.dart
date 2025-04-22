@@ -11,10 +11,10 @@ class ExpensesScreen extends StatefulWidget {
 
 class _ExpensesScreenState extends State<ExpensesScreen> {
   int _currentIndex = 0;
-  List<Widget> _bottomItemsList = [
-    ExpensesToday(),
-    ExpensesWeek(),
-    ExpensesAll(),
+  final List<Widget> _bottomItemsList = [
+    const ExpensesToday(),
+    const ExpensesWeek(),
+    const ExpensesAll(),
   ];
 
   void _onTap(int index) {

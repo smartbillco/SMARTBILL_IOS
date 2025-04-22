@@ -162,7 +162,7 @@ class PdfHandler {
     final String company = companyRegex.firstMatch(pdf)?.group(0).toString() ?? 'Nit:' ;
     final String? id = idRegex.firstMatch(pdf)?.group(0);
     final String? date = dateRegex.firstMatch(pdf)?.group(0);
-    final String? total = fixedCurrency;
+    final String total = fixedCurrency;
 
     Map<String, dynamic> extractedPdf = {
       'is_pdf': true,

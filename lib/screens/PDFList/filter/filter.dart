@@ -48,9 +48,9 @@ class _FilterScreenState extends State<FilterScreen> {
                     readOnly: true,
                     decoration: InputDecoration(
                       labelText: 'Fecha inicial',
-                      border: OutlineInputBorder(),
+                      border: const OutlineInputBorder(),
                       suffixIcon: IconButton(
-                        icon: Icon(Icons.calendar_today),
+                        icon: const Icon(Icons.calendar_today),
                         onPressed: () => _selectDate(context, _startDateController),
                       ),
                     ),

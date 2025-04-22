@@ -96,8 +96,8 @@ class _CryptoListScreenState extends State<CryptoListScreen> {
                           title: Text('${crypto.name} (${crypto.symbol.toUpperCase()})'),
                           subtitle: Text('\$${crypto.price.toStringAsFixed(2)}'),
                           trailing: isFavorite
-                              ? Icon(Icons.star, color: Colors.amber)
-                              : Icon(Icons.star_border),
+                              ? const Icon(Icons.star, color: Colors.amber)
+                              : const Icon(Icons.star_border),
                           onTap: () async {
                             if (favoriteIds.contains(crypto.id)) {
                               await _removeFavorite(crypto.id);

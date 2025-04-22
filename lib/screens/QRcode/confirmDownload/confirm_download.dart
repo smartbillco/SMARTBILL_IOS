@@ -65,7 +65,7 @@ class _ConfirmDownloadScreenState extends State<ConfirmDownloadScreen> {
     String token = getTokenFromUrl();
 
     setState(() {
-      downloadUrl = "https://catalogo-vpfe.dian.gov.co/Document/DownloadPDF?trackId=${id}&token=${token}";
+      downloadUrl = "https://catalogo-vpfe.dian.gov.co/Document/DownloadPDF?trackId=$id&token=$token";
     });
 
     print("This is the download url: $downloadUrl");
@@ -134,7 +134,7 @@ class _ConfirmDownloadScreenState extends State<ConfirmDownloadScreen> {
       appBar: AppBar(),
       body: Center(
         child: isLoading
-        ? CircularProgressIndicator()
+        ? const CircularProgressIndicator()
         : AlertDialog(
           shadowColor: Colors.grey,
           title: const Text("Desea descargar el archivo?"),

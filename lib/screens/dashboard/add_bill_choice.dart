@@ -69,7 +69,7 @@ class _AddBillChoiceState extends State<AddBillChoice> {
         
         print("ERROR saving pdf: $e");
 
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Parece que la factura ya existe.")));
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Parece que la factura ya existe.")));
 
         Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => const ReceiptScreen()));
       }

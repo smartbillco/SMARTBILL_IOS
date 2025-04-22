@@ -62,7 +62,7 @@ class _AddIncomeFormState extends State<AddIncomeForm> {
       resizeToAvoidBottomInset: false,
       appBar: AppBar(),
       body: Padding(
-        padding: EdgeInsets.all(25),
+        padding: const EdgeInsets.all(25),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: 

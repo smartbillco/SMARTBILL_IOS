@@ -11,7 +11,7 @@ class DeleteAccountScreen extends StatefulWidget {
 }
 
 class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
-  AuthService _auth = AuthService();
+  final AuthService _auth = AuthService();
   User? user = FirebaseAuth.instance.currentUser;
 
   Future<void> deleteCurrentAccount() async {

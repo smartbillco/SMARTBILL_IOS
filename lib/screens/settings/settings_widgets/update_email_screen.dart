@@ -67,7 +67,7 @@ class _UpdateEmailScreenState extends State<UpdateEmailScreen> {
                 ),
                 onPressed: _updateCurrentEmail,
                 child: isLoading
-                ? CircularProgressIndicator()
+                ? const CircularProgressIndicator()
                 : const Text("Enviar", style: TextStyle(color: Colors.white, fontSize: 16),)
               ),
             )

@@ -30,8 +30,6 @@ class _UpdateAddressScreenState extends State<UpdateAddressScreen> {
       }
       Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const DashboardScreen())); 
 
-    } catch(e) {
-
     } finally {
       setState(() {
         isLoading = false;
@@ -47,7 +45,7 @@ class _UpdateAddressScreenState extends State<UpdateAddressScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Actualizar ID"),
+        title: const Text("Actualizar ID"),
       ),
       body: Padding(
         padding: const EdgeInsets.all(35),

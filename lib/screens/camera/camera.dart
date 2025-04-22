@@ -45,7 +45,7 @@ class _CameraShotScreenState extends State<CameraShotScreen> {
   @override
   Widget build(BuildContext context) {
     if (_controller == null || !_controller!.value.isInitialized) {
-      return Center(child: CircularProgressIndicator());
+      return const Center(child: CircularProgressIndicator());
     }
 
     return Scaffold(
@@ -82,7 +82,7 @@ class _CameraShotScreenState extends State<CameraShotScreen> {
               child: FloatingActionButton(
                 onPressed: _takePicture,
                 backgroundColor: Colors.white,
-                child: Icon(Icons.camera, color: Colors.black),
+                child: const Icon(Icons.camera, color: Colors.black),
               ),
             ),
           ),
