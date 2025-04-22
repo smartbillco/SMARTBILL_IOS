@@ -15,6 +15,7 @@ class DrawerMenu extends StatefulWidget {
 class _DrawerMenuState extends State<DrawerMenu> {
   final AuthService _auth = AuthService();
   User? user = FirebaseAuth.instance.currentUser;
+  String? userName;
   String? phoneNumber;
 
 
@@ -30,8 +31,9 @@ class _DrawerMenuState extends State<DrawerMenu> {
     return name!.split(' ').first;
   }
 
-  void parsePhoneNumber() {
+  void setValues() {
     setState(() {
+      userName = user!.displayName.toString();
       phoneNumber = formatPhoneNumber(user!.phoneNumber.toString());
     });
   }
@@ -52,7 +54,7 @@ class _DrawerMenuState extends State<DrawerMenu> {
   @override
   void initState() {
     super.initState();
-    parsePhoneNumber();
+    setValues();
   }
 
   //Logout
@@ -79,7 +81,7 @@ class _DrawerMenuState extends State<DrawerMenu> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: 25),
-                  user!.displayName == null
+                  user!.displayName == null || user!.displayName == ''
                   ? const Text("Bievenido!", style: TextStyle(color: Colors.white, fontSize: 26))
                   : Text("Hola, ${formatName(user!.displayName).toString()}", style: const TextStyle(color: Colors.white, fontSize: 26)),
                   const SizedBox(height: 20),

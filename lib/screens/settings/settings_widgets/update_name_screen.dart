@@ -30,7 +30,7 @@ class _UpdateNameScreenState extends State<UpdateNameScreen> {
       await customUser.updateDisplayName(fullName);
 
       if(mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Documento de identidad actualizado")));
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Nombre actualizado")));
       }
       Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const DashboardScreen())); 
 

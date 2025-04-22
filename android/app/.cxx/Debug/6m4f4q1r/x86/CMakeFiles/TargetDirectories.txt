@@ -1,0 +1,2 @@
+C:/Users/User/Desktop/flutter_apps/smartbill/android/app/.cxx/Debug/6m4f4q1r/x86/CMakeFiles/edit_cache.dir
+C:/Users/User/Desktop/flutter_apps/smartbill/android/app/.cxx/Debug/6m4f4q1r/x86/CMakeFiles/rebuild_cache.dir

@@ -4,7 +4,9 @@ import 'package:smartbill/screens/dashboard/dashboard_widgets/dashboard_containe
 import 'package:smartbill/screens/deleteAccount/delete_account.dart';
 import 'package:smartbill/screens/settings/settings.dart';
 import 'package:smartbill/services/auth.dart';
+import 'package:smartbill/services/colombian_bill.dart';
 import 'package:smartbill/services/pdf_reader.dart';
+import 'package:smartbill/services/peruvian_bill.dart';
 import 'package:smartbill/services/xml/xml.dart';
 
 
@@ -18,6 +20,8 @@ class DashboardScreen extends StatefulWidget {
 class _DashboardScreenState extends State<DashboardScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final Xmlhandler xmlhandler = Xmlhandler();
+  final ColombianBill colombianBill = ColombianBill();
+  final PeruvianBill peruvianBill = PeruvianBill();
   final PdfService pdfService = PdfService();
   final AuthService _auth = AuthService();
 
@@ -43,7 +47,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
     if(mounted) {
       var resultXmls = await xmlhandler.getXmls();
       var resultPdfs = await pdfService.fetchAllPdfs();
-      var total = await resultXmls.length + resultPdfs.length;
+      var allColombianBills = await colombianBill.getColombianBills();
+      var allPeruvianBills = await peruvianBill.getPeruvianBills();
+      var total = await resultXmls.length + resultPdfs.length + allColombianBills.length + allPeruvianBills.length;
 
       if(mounted) {
         setState(() {

@@ -44,37 +44,59 @@ class PdfService {
 
   }
 
+  double parseDouble(String number) {
+    // Remove all spaces
+  number = number.replaceAll(' ', '');
+
+  // If there are both '.' and ',' in the string
+  if (number.contains('.') && number.contains(',')) {
+    // Assume the last separator is the decimal separator
+    int lastDot = number.lastIndexOf('.');
+    int lastComma = number.lastIndexOf(',');
+
+    if (lastDot > lastComma) {
+      // Dot is decimal separator
+      number = number.replaceAll(',', '');
+    } else {
+      // Comma is decimal separator
+      number = number.replaceAll('.', '');
+      number = number.replaceAll(',', '.');
+    }
+  } else if (number.contains(',')) {
+    // Assume comma is the decimal separator if it's used only once
+    int commaCount = '.'.allMatches(number).length;
+    if (commaCount == 1) {
+      number = number.replaceAll(',', '.');
+    } else {
+      // Otherwise, assume it's a thousands separator
+      number = number.replaceAll(',', '');
+    }
+  } else if (number.contains('.')) {
+    // Handle possible thousands separators
+    List<String> parts = number.split('.');
+    if (parts.length > 2) {
+      // More than one dot → assume dots are thousands separators
+      number = number.replaceAll('.', '');
+    }
+  }
+
+  return double.parse(number);
+  }
+
   Future<void> saveExtractedText(File pdfFile) async {
     Map<String, dynamic> pdfData = await extractTextfromPdf(pdfFile);
+
+    double amount = parseDouble(pdfData['TOTAL']);
+
+    print("Double: $amount");
+
+    final Pdf pdf = Pdf(cufe: pdfData['CUFE'], nit: pdfData['NIT'], date: pdfData['FECHA'], totalAmount: amount);
+
+    int result = await pdf.insertToDatabase();
+
+    print("El registro número $result, se creó");
+
     
-
-    if(pdfData['MONTO_TOTAL'].contains('.')) {
-      int lastDot = pdfData['MONTO_TOTAL'].lastIndexOf('.');
-      String integerPart = pdfData['MONTO_TOTAL'].substring(0, lastDot).replaceAll('.', '');
-      String decimalPart = pdfData['MONTO_TOTAL'].substring(lastDot + 1);
-      String formattedNumber = "$integerPart.$decimalPart";
-      double amount = double.parse(formattedNumber);
-
-      print("PRINT: $amount");
-
-      final Pdf pdf = Pdf(cufe: pdfData['CUFE'], nit: pdfData['NIT'], date: pdfData['FECHA'], totalAmount: amount);
-
-      int result = await pdf.insertToDatabase();
-
-      print("El registro número $result, se creó");
-
-    } else {
-
-      final double amount = double.parse(pdfData['MONTO_TOTAL']);
-
-      final Pdf pdf = Pdf(cufe: pdfData['CUFE'], nit: pdfData['NIT'], date: pdfData['FECHA'], totalAmount: amount);
-
-      int result = await pdf.insertToDatabase();
-
-      print("El registro número $result, se creó");
-    }
-    
-
   }
 
   Future<dynamic> fetchAllPdfs() async {

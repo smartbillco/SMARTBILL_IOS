@@ -1,6 +1,9 @@
 import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:smartbill/screens/dashboard/display_image.dart';
 import 'package:smartbill/services/pdf_reader.dart';
 import 'package:smartbill/screens/receipts.dart/receipt_screen.dart';
 import 'package:smartbill/services/pdf.dart';
@@ -17,7 +20,6 @@ class _AddBillChoiceState extends State<AddBillChoice> {
   final Xmlhandler xmlhandler = Xmlhandler();
   final PdfHandler pdfHandler = PdfHandler();
   final PdfService pdfService = PdfService();
-  bool isImageWorking = false;
 
   //Snackbar for receipt cancel
   //Cancelled picking a xml file
@@ -69,7 +71,7 @@ class _AddBillChoiceState extends State<AddBillChoice> {
         
         print("ERROR saving pdf: $e");
 
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Parece que la factura ya existe.")));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("La factura ya existe, o hubo un error cargandola. Intente con otra factura.")));
 
         Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => const ReceiptScreen()));
       }
@@ -79,6 +81,26 @@ class _AddBillChoiceState extends State<AddBillChoice> {
       print("Se cancelo");
       _showSnackbarCancelXml();
     }
+  }
+
+
+  Future<void> _pickImage() async {
+    final pickedImage = await ImagePicker().pickImage(source: ImageSource.gallery);
+
+    if(pickedImage != null) {
+      final inputImage = InputImage.fromFilePath(pickedImage.path);
+      final textRecognizer = TextRecognizer(script: TextRecognitionScript.latin);
+      final recognizedText = await textRecognizer.processImage(inputImage);
+
+      final image = File(pickedImage.path);
+
+      Navigator.push(context, MaterialPageRoute(builder: (context) => DisplayImageScreen(image: image, recognizedText: recognizedText.text)));
+
+      
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("No se selecciono imagen")));
+    }
+
   }
 
 
@@ -116,21 +138,17 @@ class _AddBillChoiceState extends State<AddBillChoice> {
               ),
             ),
 
-            isImageWorking
-            ? Card(
+            Card(
               elevation: 4,
               margin: const EdgeInsets.symmetric(vertical: 8),
               child: ListTile(
-                onTap: () {
-
-                },
+                onTap: _pickImage,
                 contentPadding: const EdgeInsets.all(10),
                 leading: const Icon(Icons.image, color: Colors.green, size: 28),
                 title: const Text("Subir imagen de factura"),
                 trailing: const Icon(Icons.arrow_forward_ios, color: Colors.grey),
               ),
             )
-            : const SizedBox.shrink()
           ],
         ) 
       ),
