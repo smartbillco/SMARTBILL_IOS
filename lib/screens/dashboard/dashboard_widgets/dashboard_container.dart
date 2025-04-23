@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:smartbill/screens/PDFList/pdf_list.dart';
+import 'package:smartbill/screens/dashboard/dashboard_widgets/dashboard_carrousel.dart';
 //import 'package:smartbill/screens/camera/camera.dart';
 import 'package:smartbill/screens/expenses/expenses.dart';
 import 'package:smartbill/screens/dashboard/add_bill_choice.dart';
@@ -38,6 +39,9 @@ class _DashboardContainerState extends State<DashboardContainer> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const DashboardText(),
+          //Carrousel
+          const DashboardCarrousel(),
+          SizedBox(height: 20),
           //First row of navigation
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -111,7 +115,9 @@ class _DashboardContainerState extends State<DashboardContainer> {
                 ])
               : SizedBox.shrink()
             ],
-          )
+          ),
+          const SizedBox(height: 30,)
+
         ],
       ),
     );

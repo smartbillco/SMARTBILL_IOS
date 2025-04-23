@@ -12,6 +12,7 @@ class QrcodeLinkScreen extends StatefulWidget {
 
 class _QrcodeLinkScreenState extends State<QrcodeLinkScreen> {
   late InAppWebViewController webViewController;
+  bool cloudflarePassed = false;
 
   //DIAN receipt variables
   String? originalUrl;
@@ -53,15 +54,38 @@ class _QrcodeLinkScreenState extends State<QrcodeLinkScreen> {
             webViewController = controller;
           },
           onLoadStart: (controller, url) {
-            print("On load: $url");
+            if(url.toString().contains('ShowDocument')) {
+              cloudflarePassed = true;
+            } else {
+              cloudflarePassed = false;
+            }
+            print("On load: $originalUrl");
             originalUrl ??= url.toString();
+            
+            print("On load: $url");
+            print("On load: $originalUrl");
+          
+            
           },
           onUpdateVisitedHistory: (controller, url, isReload) {
-            print("onUpdate: $url");
-            if(originalUrl != null && originalUrl != url.toString() && !hasNavigated) {
+            // Option 1: URL check
+            print("onUpdate 1: $url");
+            print("onUpdate 2: $cloudflarePassed");
+            print("onUpdate 3: $originalUrl");
+            print("onUpdate 4: $url");
+
+
+            if(originalUrl != null && originalUrl != url.toString() && !hasNavigated && cloudflarePassed) {
               hasNavigated = true;
               Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => ConfirmDownloadScreen(url: url.toString())));
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Espera a que cloudflare te autentique")));
+
             }
+          },
+          onCloseWindow: (controller) {
+            Navigator.pop(context);
+            print("window closed");
           },
         ),
       ),

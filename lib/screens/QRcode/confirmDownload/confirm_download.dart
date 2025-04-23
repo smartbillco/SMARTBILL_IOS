@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:provider/provider.dart';
+import 'package:smartbill/screens/PDFList/pdf_list.dart';
 import 'package:smartbill/screens/dashboard/dashboard.dart';
 import 'package:smartbill/services/settings.dart';
 
@@ -106,13 +107,15 @@ class _ConfirmDownloadScreenState extends State<ConfirmDownloadScreen> {
         openFileFromNotification: true,
       );
 
-      await Future.delayed(const Duration(seconds: 3), () {
+      await Future.delayed(const Duration(seconds: 6), () {
         setState(() {
           isLoading = false;
         });
 
         showSnackbar("Se ha descargado la factura");
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const DashboardScreen()));
+        Navigator.pop(context);
+        
+        Navigator.push(context, MaterialPageRoute(builder: (context) => const PDFListScreen()));
       });
 
     } catch (e) {
