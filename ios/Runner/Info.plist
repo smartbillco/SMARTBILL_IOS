@@ -54,13 +54,13 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
-	<string>Necesitamos acceso a la cámara para capturar fotos</string>
+	<string>Necesitamos acceso a la cámara para capturar fotos de tus facturas</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Necesitamos acceso a tu microfono</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Necesitamos permiso para acceder a tus archivos.</string>
+	<string>Necesitamos permiso para acceder a tus facturas.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>Necesitamos permiso para acceder a tus archivos.</string>
+	<string>Necesitamos permiso para acceder a tus facturas.</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>

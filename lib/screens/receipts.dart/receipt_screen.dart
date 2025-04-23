@@ -142,7 +142,6 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
     }
   }
 
-  
 
   @override
   void initState() {
@@ -230,7 +229,7 @@ class _ListReceiptsState extends State<ListReceipts> {
       subtitle: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(widget.fileContent[widget.index]['company'], style: const TextStyle(fontSize: 18)),
+          Text(widget.fileContent[widget.index]['company'].substring(0,10), style: const TextStyle(fontSize: 16)),
           Text(widget.fileContent[widget.index]['company_id'], style: const TextStyle(fontSize: 16)),
           Text(NumberFormat('#,##0.00', 'en_US').format(double.parse(widget.fileContent[widget.index]['price'])), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
         ]

@@ -20,6 +20,7 @@ class _AddBillChoiceState extends State<AddBillChoice> {
   final Xmlhandler xmlhandler = Xmlhandler();
   final PdfHandler pdfHandler = PdfHandler();
   final PdfService pdfService = PdfService();
+  final bool isImageAvailable = false;
 
   //Snackbar for receipt cancel
   //Cancelled picking a xml file
@@ -71,7 +72,7 @@ class _AddBillChoiceState extends State<AddBillChoice> {
         
         print("ERROR saving pdf: $e");
 
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("La factura ya existe, o hubo un error cargandola. Intente con otra factura.")));
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("La factura ya existe, o hubo un error cargandola. Intente con otra factura.")));
 
         Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => const ReceiptScreen()));
       }
@@ -137,8 +138,8 @@ class _AddBillChoiceState extends State<AddBillChoice> {
                 trailing: const Icon(Icons.arrow_forward_ios, color: Colors.grey),
               ),
             ),
-
-            Card(
+            isImageAvailable
+            ? Card(
               elevation: 4,
               margin: const EdgeInsets.symmetric(vertical: 8),
               child: ListTile(
@@ -149,6 +150,7 @@ class _AddBillChoiceState extends State<AddBillChoice> {
                 trailing: const Icon(Icons.arrow_forward_ios, color: Colors.grey),
               ),
             )
+            : const SizedBox.shrink()
           ],
         ) 
       ),

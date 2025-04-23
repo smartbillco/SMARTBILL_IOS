@@ -23,6 +23,7 @@ class _PDFListScreenState extends State<PDFListScreen> {
   PdfHandler pdfHandler = PdfHandler();
   num totalBills = 0;
   num totalAmount = 0;
+  num total = 0;
 
 
   @override
@@ -245,6 +246,8 @@ String? extractTotalPrice(List<String> textList) {
 
                 double totalAmount = double.tryParse(data['total']?.toString() ?? '0') ?? 0;
 
+                total = totalAmount;
+
                 return Card(
                   child: ListTile(
                     onLongPress: () async {
@@ -286,7 +289,7 @@ String? extractTotalPrice(List<String> textList) {
                       children: [
                         Text(data['company'] ?? ''),
                         Text(data['date'] ?? ''),
-                        Text(currencyFormatter.format(totalAmount), style: const TextStyle(fontWeight: FontWeight.w600)),
+                        Text(currencyFormatter.format(total), style: const TextStyle(fontWeight: FontWeight.w600)),
                       ],
                     ),
                     onTap: () => openPdf(file.path),
