@@ -8,6 +8,7 @@ import 'package:smartbill/services/colombian_bill.dart';
 import 'package:smartbill/services/pdf_reader.dart';
 import 'package:smartbill/services/peruvian_bill.dart';
 import 'package:smartbill/services/xml/xml.dart';
+import 'package:smartbill/route_observer.dart';
 
 
 class DashboardScreen extends StatefulWidget {
@@ -17,7 +18,7 @@ class DashboardScreen extends StatefulWidget {
   State<DashboardScreen> createState() => _DashboardScreenState();
 }
 
-class _DashboardScreenState extends State<DashboardScreen> {
+class _DashboardScreenState extends State<DashboardScreen> with RouteAware {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final Xmlhandler xmlhandler = Xmlhandler();
   final ColombianBill colombianBill = ColombianBill();
@@ -34,13 +35,25 @@ class _DashboardScreenState extends State<DashboardScreen> {
     getNumberOfBills();
   }
 
+
   @override
   void didChangeDependencies() {
-    // TODO: implement didChangeDependencies
     super.didChangeDependencies();
-
+    routeObserver.subscribe(this, ModalRoute.of(context)!);
   }
-  
+
+  @override
+  void dispose() {
+    routeObserver.unsubscribe(this);
+    super.dispose();
+  }
+
+  @override
+  void didPopNext() {
+    // your refresh logic
+    getNumberOfBills();
+  }
+
   //Get bills amount
   Future<void> getNumberOfBills() async {
 
@@ -107,15 +120,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
               AppBar(
                 title: const Text("Dashboard", style: TextStyle(color: Colors.white)),
                 centerTitle: true,
-                backgroundColor: Colors.transparent,
-                actions: [
-                  IconButton(
+                backgroundColor: Colors.transparent,           
+                leading: IconButton(
                     icon: const Icon(Icons.more_horiz, color: Colors.white,),
                     onPressed: () {
                       _scaffoldKey.currentState?.openDrawer(); // Open the drawer
                     },
-                  ),
-                ],
+                ),
+                
               ),
               Text(
                 billsAmount > 0 ? billsAmount.toString() : "0",

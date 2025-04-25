@@ -67,7 +67,7 @@ class _AddExpensesFormState extends State<AddExpensesForm> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: 
           [
-            const Text("Agregar ingreso", style: TextStyle(fontWeight: FontWeight.w300, fontSize: 30),),
+            const Text("Agregar gasto", style: TextStyle(fontWeight: FontWeight.w300, fontSize: 30),),
             const SizedBox(height: 40),
             Form(
               key: _formKey,
@@ -75,7 +75,7 @@ class _AddExpensesFormState extends State<AddExpensesForm> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   SizedBox(
-                    width: 230,
+                    width: 220,
                     child: TextFormField(
                       inputFormatters: [
                         ThousandsSeparatorInputFormatter()
@@ -95,13 +95,13 @@ class _AddExpensesFormState extends State<AddExpensesForm> {
                       },
                     ),
                   ),
-                  const SizedBox(height: 45),
+                  const SizedBox(height: 40),
                   DropdownButtonFormField<String>(
                     value: _selectedCategory,
                     decoration: const InputDecoration(
                       labelText: "Categoría",
                     ),
-                    items: ["Mercado", "Arriendo", "Servicios", "Transporte", "Salidas", "Salud", "Deuda", "Otro"].map((String category) {
+                    items: ["Mercado", "Alimentación", "Arriendo", "Servicios", "Transporte", "Salidas", "Salud", "Deuda", "Otro"].map((String category) {
                       return DropdownMenuItem<String>(
                         value: category,
                         child: Text(category),

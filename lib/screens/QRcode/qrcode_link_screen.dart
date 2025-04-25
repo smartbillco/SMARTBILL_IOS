@@ -23,6 +23,7 @@ class _QrcodeLinkScreenState extends State<QrcodeLinkScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
+
   }
 
   void showSnackbar(String content) {
@@ -30,6 +31,7 @@ class _QrcodeLinkScreenState extends State<QrcodeLinkScreen> {
 
     ScaffoldMessenger.of(context).showSnackBar(snackbar);
   }
+
 
 
   @override
