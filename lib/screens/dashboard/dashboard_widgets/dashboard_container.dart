@@ -1,6 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:smartbill/screens/PDFList/pdf_list.dart';
+import 'package:smartbill/screens/QRcode/qrcode_link_screen.dart';
+import 'package:smartbill/screens/QRcode/qrcode_screen.dart';
 import 'package:smartbill/screens/dashboard/dashboard_widgets/dashboard_carrousel.dart';
 //import 'package:smartbill/screens/camera/camera.dart';
 import 'package:smartbill/screens/expenses/expenses.dart';
@@ -88,7 +90,7 @@ class _DashboardContainerState extends State<DashboardContainer> {
                 icon: const Icon(Icons.qr_code, color: Colors.white, size: 35),
                 text: "Escanear QR",
                 redirect: () {
-                  redirectToScreen(const QRScanner());
+                  redirectToScreen(const QrcodeLinkScreen(uri: 'https://catalogo-vpfe-hab.dian.gov.co/User/SearchDocument'));
                 },
                 colors: const [
                   Color.fromARGB(255, 252, 182, 30),
@@ -116,7 +118,7 @@ class _DashboardContainerState extends State<DashboardContainer> {
               : const SizedBox.shrink()
             ],
           ),
-          const SizedBox(height: 30,)
+          const SizedBox(height: 50,)
 
         ],
       ),

@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:smartbill/screens/QRcode/confirmDownload/confirm_download.dart';
 
 class QrcodeLinkScreen extends StatefulWidget {
@@ -54,6 +57,7 @@ class _QrcodeLinkScreenState extends State<QrcodeLinkScreen> {
             webViewController = controller;
           },
           onLoadStart: (controller, url) {
+            print(url.toString());
             if(url.toString().contains('ShowDocument')) {
               cloudflarePassed = true;
             } else {
@@ -67,6 +71,15 @@ class _QrcodeLinkScreenState extends State<QrcodeLinkScreen> {
           
             
           },
+          shouldOverrideUrlLoading: (controller, navigationAction) async {
+            final url = navigationAction.request.url;
+
+            final dir = Platform.isAndroid
+              ? await getExternalStorageDirectory()
+              : await getApplicationDocumentsDirectory();
+
+
+          },
           onUpdateVisitedHistory: (controller, url, isReload) {
             // Option 1: URL check
             print("onUpdate 1: $url");
@@ -74,19 +87,21 @@ class _QrcodeLinkScreenState extends State<QrcodeLinkScreen> {
             print("onUpdate 3: $originalUrl");
             print("onUpdate 4: $url");
 
+            if(Platform.isAndroid) {
 
-            if(originalUrl != null && originalUrl != url.toString() && !hasNavigated && cloudflarePassed) {
-              hasNavigated = true;
-              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => ConfirmDownloadScreen(url: url.toString())));
-            } else {
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Espera a que cloudflare te autentique")));
+              if(originalUrl != null && originalUrl != url.toString() && !hasNavigated && cloudflarePassed) {
+                hasNavigated = true;
+                Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => ConfirmDownloadScreen(url: url.toString())));
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Por favor espera a que cloudflare te autentique")));
 
+              }
+              
             }
+            print("Triggered updated");
+            
           },
-          onCloseWindow: (controller) {
-            Navigator.pop(context);
-            print("window closed");
-          },
+          
         ),
       ),
     );
