@@ -10,52 +10,172 @@ import 'package:path/path.dart';
     var path = join(databasesPath, 'smartbill.db');
 
     return db = await openDatabase(path, version: 5,
-      //If creating the database for the first time
       onCreate: (Database db, int version) async {
+        // Version 1
+        await db.execute('''
+          CREATE TABLE IF NOT EXISTS xml_files (
+            _id INTEGER PRIMARY KEY AUTOINCREMENT,
+            xml_text TEXT NOT NULL
+          )
+        ''');
 
-        //Version 1
-        await db.execute('''create table if not exists xml_files(_id integer primary key autoincrement, xml_text text not null)''');
-        
-        //Version 2
-        await db.execute('''create table if not exists pdf_files(_id integer primary key autoincrement, cufe text unique, nit text, date text, total_amount real)''');
+        // Version 2
+        await db.execute('''
+          CREATE TABLE IF NOT EXISTS pdf_files (
+            _id INTEGER PRIMARY KEY AUTOINCREMENT,
+            cufe TEXT UNIQUE,
+            nit TEXT,
+            date TEXT,
+            total_amount REAL
+          )
+        ''');
 
-        //Version 3
-        await db.execute('''create table if not exists colombian_bill(_id integer primary key autoincrement, bill_number text not null, date text, time text, nit text, customer_id text, amount_before_iva text, iva text, other_tax text, total_amount text, cufe text)''');
-        await db.execute('''create table if not exists peruvian_bill(_id integer primary key autoincrement, ruc_company text not null, receipt_id text, code_start text, code_end text, igv text, amount text, date text, percentage text, ruc_customer text, summery text)''');
+        // Version 3
+        await db.execute('''
+          CREATE TABLE IF NOT EXISTS colombian_bill (
+            _id INTEGER PRIMARY KEY AUTOINCREMENT,
+            bill_number TEXT NOT NULL,
+            date TEXT,
+            time TEXT,
+            nit TEXT,
+            customer_id TEXT,
+            amount_before_iva TEXT,
+            iva TEXT,
+            other_tax TEXT,
+            total_amount TEXT,
+            cufe TEXT
+          )
+        ''');
 
-        //Version 4
-        await db.execute('''create table if not exists transactions(_id integer primary key autoincrement, userId text not null, amount real, date text, category text, description text, type text)''');
-        await db.execute('''create table if not exists favorites(_id integer primary key autoincrement, userId text not null, cryptoId text unique)''');
+        await db.execute('''
+          CREATE TABLE IF NOT EXISTS peruvian_bill (
+            _id INTEGER PRIMARY KEY AUTOINCREMENT,
+            ruc_company TEXT NOT NULL,
+            receipt_id TEXT,
+            code_start TEXT,
+            code_end TEXT,
+            igv TEXT,
+            amount TEXT,
+            date TEXT,
+            percentage TEXT,
+            ruc_customer TEXT,
+            summery TEXT
+          )
+        ''');
 
-        //Version 5
-        await db.execute('''create table if not exists pdfs(_id integer primary key autoincrement, cufe text unique, nit text, date text, total_amount real)''');
-      
+        // Version 4
+        await db.execute('''
+          CREATE TABLE IF NOT EXISTS transactions (
+            _id INTEGER PRIMARY KEY AUTOINCREMENT,
+            userId TEXT NOT NULL,
+            amount REAL,
+            date TEXT,
+            category TEXT,
+            description TEXT,
+            type TEXT
+          )
+        ''');
+
+        await db.execute('''
+          CREATE TABLE IF NOT EXISTS favorites (
+            _id INTEGER PRIMARY KEY AUTOINCREMENT,
+            userId TEXT NOT NULL,
+            cryptoId TEXT UNIQUE
+          )
+        ''');
+
+        // Version 5
+        await db.execute('''
+          CREATE TABLE IF NOT EXISTS pdfs (
+            _id INTEGER PRIMARY KEY AUTOINCREMENT,
+            cufe TEXT UNIQUE,
+            nit TEXT,
+            date TEXT,
+            total_amount REAL
+          )
+        ''');
       },
       onUpgrade: (db, oldVersion, newVersion) async {
-        if(oldVersion < 2) {
-          await db.execute('''create table if not exists pdfs(_id integer primary key autoincrement, cufe text unique, nit text, date text, total_amount real)''');
-          await db.execute('''create table if not exists colombian_bill(_id integer primary key autoincrement, bill_number text not null, date text, time text, nit text, customer_id text, amount_before_iva text, iva text, other_tax text, total_amount text, cufe text)''');
-          await db.execute('''create table if not exists peruvian_bill(_id integer primary key autoincrement, ruc_company text not null, receipt_id text, code_start text, code_end text, igv text, amount text, date text, percentage text, ruc_customer text, summery text)''');
-          await db.execute('''create table if not exists income(_id integer primary key autoincrement, userId text not null, amount real, date text, category text, description text)''');
-          await db.execute('''create table if not exists transactions(_id integer primary key autoincrement, userId text not null, amount real, date text, category text, description text, type text)''');
-          await db.execute('''create table if not exists favorites(_id integer primary key autoincrement, userId text not null, cryptoId text unique)''');
+        if (oldVersion < 2) {
+          await db.execute('''
+            CREATE TABLE IF NOT EXISTS pdf_files (
+              _id INTEGER PRIMARY KEY AUTOINCREMENT,
+              cufe TEXT UNIQUE,
+              nit TEXT,
+              date TEXT,
+              total_amount REAL
+            )
+          ''');
         }
-        if(oldVersion < 3) {
-           await db.execute('''create table if not exists pdfs(_id integer primary key autoincrement, cufe text unique, nit text, date text, total_amount real)''');
-          await db.execute('''create table if not exists colombian_bill(_id integer primary key autoincrement, bill_number text not null, date text, time text, nit text, customer_id text, amount_before_iva text, iva text, other_tax text, total_amount text, cufe text)''');
-          await db.execute('''create table if not exists peruvian_bill(_id integer primary key autoincrement, ruc_company text not null, receipt_id text, code_start text, code_end text, igv text, amount text, date text, percentage text, ruc_customer text, summery text)''');
-          await db.execute('''create table if not exists transactions(_id integer primary key autoincrement, userId text not null, amount real, date text, category text, description text, type text)''');
-          await db.execute('''create table if not exists favorites(_id integer primary key autoincrement, userId text not null, cryptoId text unique)''');
+        if (oldVersion < 3) {
+          await db.execute('''
+            CREATE TABLE IF NOT EXISTS colombian_bill (
+              _id INTEGER PRIMARY KEY AUTOINCREMENT,
+              bill_number TEXT NOT NULL,
+              date TEXT,
+              time TEXT,
+              nit TEXT,
+              customer_id TEXT,
+              amount_before_iva TEXT,
+              iva TEXT,
+              other_tax TEXT,
+              total_amount TEXT,
+              cufe TEXT
+            )
+          ''');
+
+          await db.execute('''
+            CREATE TABLE IF NOT EXISTS peruvian_bill (
+              _id INTEGER PRIMARY KEY AUTOINCREMENT,
+              ruc_company TEXT NOT NULL,
+              receipt_id TEXT,
+              code_start TEXT,
+              code_end TEXT,
+              igv TEXT,
+              amount TEXT,
+              date TEXT,
+              percentage TEXT,
+              ruc_customer TEXT,
+              summery TEXT
+            )
+          ''');
         }
-        if(oldVersion < 4) {
-          await db.execute('''create table if not exists pdfs(_id integer primary key autoincrement, cufe text unique, nit text, date text, total_amount real)''');
-          await db.execute('''create table if not exists transactions(_id integer primary key autoincrement, userId text not null, amount real, date text, category text, description text, type text)''');
-          await db.execute('''create table if not exists favorites(_id integer primary key autoincrement, userId text not null, cryptoId text unique)''');
-        } 
-        if(oldVersion < 5) {
-           await db.execute('''create table if not exists pdfs(_id integer primary key autoincrement, cufe text unique, nit text, date text, total_amount real)''');
+        if (oldVersion < 4) {
+          await db.execute('''
+            CREATE TABLE IF NOT EXISTS transactions (
+              _id INTEGER PRIMARY KEY AUTOINCREMENT,
+              userId TEXT NOT NULL,
+              amount REAL,
+              date TEXT,
+              category TEXT,
+              description TEXT,
+              type TEXT
+            )
+          ''');
+
+          await db.execute('''
+            CREATE TABLE IF NOT EXISTS favorites (
+              _id INTEGER PRIMARY KEY AUTOINCREMENT,
+              userId TEXT NOT NULL,
+              cryptoId TEXT UNIQUE
+            )
+          ''');
         }
-      }
+        if (oldVersion < 5) {
+          await db.execute('''
+            CREATE TABLE IF NOT EXISTS pdfs (
+              _id INTEGER PRIMARY KEY AUTOINCREMENT,
+              cufe TEXT UNIQUE,
+              nit TEXT,
+              date TEXT,
+              total_amount REAL
+            )
+          ''');
+        }
+        if(oldVersion < 6) {
+          await db.execute('ALTER TABLE colombian_bill ADD COLUMN dian_link TEXT');
+        }
+      },
     );
   }
 

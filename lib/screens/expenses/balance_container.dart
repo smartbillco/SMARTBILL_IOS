@@ -23,7 +23,7 @@ class _BalanceContainerState extends State<BalanceContainer> {
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text("Tu saldo:", style: TextStyle(color: Colors.white, fontWeight: FontWeight.w200, fontSize: 16)),
+            Text("Balance:", style: TextStyle(color: Colors.white, fontWeight: FontWeight.w200, fontSize: 16)),
             Text(widget.balance.toString(), style: const TextStyle(color: Colors.white,fontSize: 44, fontWeight: FontWeight.w600),)
           ],
       ));

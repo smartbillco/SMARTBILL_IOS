@@ -98,7 +98,7 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
       Map<String, dynamic> newPdf = {
         '_id': item['_id'],
         'id_bill': item['cufe'],
-        'customer': 'Cliente',
+        'customer': 'Consumidor final',
         'customer_id': 'Factura PDF',
         'company': item['nit'],
         'company_id': item['nit'],
@@ -229,9 +229,9 @@ class _ListReceiptsState extends State<ListReceipts> {
       subtitle: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(widget.fileContent[widget.index]['company'].substring(0,10), style: const TextStyle(fontSize: 16)),
-          Text(widget.fileContent[widget.index]['company_id'], style: const TextStyle(fontSize: 16)),
-          Text(NumberFormat('#,##0.00', 'en_US').format(double.parse(widget.fileContent[widget.index]['price'])), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          Text(widget.fileContent[widget.index]['company'].length > 25 ? widget.fileContent[widget.index]['company'].substring(0,25) : widget.fileContent[widget.index]['company'], style: const TextStyle(fontSize: 15)),
+          Text(widget.fileContent[widget.index]['company_id'], style: const TextStyle(fontSize: 15)),
+          Text("Valor: ${NumberFormat('#,##0.00', 'en_US').format(double.parse(widget.fileContent[widget.index]['price']))}", style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
         ]
       ),
       trailing:  IconButton(

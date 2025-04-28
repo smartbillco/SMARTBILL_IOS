@@ -17,14 +17,15 @@ class PdfHandler {
     }
 
     try {
+      
       if(isColonAfterNumFac(qrResult)) {
-        List lines = qrResult.split('\n');
+        List lines = qrResult.contains(' ') ? qrResult.split(' ') : qrResult.split('\n');
         List qrList = lines.map((item) => item.split(':').last).toList();
-        List keys = ['bill_number', 'date', 'time', 'nit', 'customer_id', 'amount_before_iva', 'iva', 'other_tax', 'total_amount', 'cufe'];
+        List keys = ['bill_number', 'date', 'time', 'nit', 'customer_id', 'amount_before_iva', 'iva', 'other_tax', 'total_amount', 'cufe', 'dian_link'];
 
         Map<String, dynamic> qrPdf = {};
 
-        for(var i = 0; i < keys.length; i++){
+        for(var i = 0; i < 11; i++){
           if(i >= qrList.length || qrList[i].trim().isEmpty) {
             qrPdf[keys[i]] = "Vacio2";
           } else {
@@ -37,27 +38,25 @@ class PdfHandler {
         return qrPdf;
 
       } else {
-        List lines = qrResult.split('\n');
+        List lines = qrResult.contains(' ') ? qrResult.split(' ') : qrResult.split('\n');
         List qrList = lines.map((item) => item.split('=')[1].split(' ')[0]).toList();
-        List keys = ['bill_number', 'date', 'time', 'nit', 'customer_id', 'amount_before_iva', 'iva', 'other_tax', 'total_amount', 'cufe'];
+        List keys = ['bill_number', 'date', 'time', 'nit', 'customer_id', 'amount_before_iva', 'iva', 'other_tax', 'total_amount', 'cufe', 'dian_link'];
 
         Map<String, dynamic> qrPdf = {};
 
-        for(var i = 0; i < keys.length; i++){
+        for(var i = 0; i < 11; i++){
           if(i >= qrList.length || qrList[i].trim().isEmpty) {
-            qrPdf[keys[i]] = "Vacio";
+            qrPdf[keys[i]] = "Vacio3";
           } else {
             qrPdf[keys[i]] = qrList[i];
           }
         }
 
-        print("Printing QR pdf $qrPdf");
+        print("Printing QR pdf right $qrPdf");
 
         return qrPdf;
 
       }
-
-      
 
     } catch(e) {
       Map<String, dynamic> error = {
