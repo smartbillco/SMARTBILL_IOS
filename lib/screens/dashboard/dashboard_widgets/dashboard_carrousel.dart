@@ -1,7 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
+import 'package:smartbill/services/crypto_provider.dart';
 import 'package:smartbill/services/db.dart';
+import 'package:smartbill/route_observer.dart';
+
 
 class DashboardCarrousel extends StatefulWidget {
   const DashboardCarrousel({super.key});
@@ -10,61 +13,109 @@ class DashboardCarrousel extends StatefulWidget {
   State<DashboardCarrousel> createState() => _DashboardCarrouselState();
 }
 
-class _DashboardCarrouselState extends State<DashboardCarrousel> {
+class _DashboardCarrouselState extends State<DashboardCarrousel> with RouteAware {
   final DatabaseConnection databaseConnection = DatabaseConnection();
+  final String userId = FirebaseAuth.instance.currentUser!.uid;
   String id = FirebaseAuth.instance.currentUser!.uid;
-  List items = [
-    'Item 1',
-    'Item 2',
-    'Item 3'
-  ];
+  bool _isLoading = false;
+  bool _done = false;
+  List favorites = [];
 
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    fetchFavoriteCrypto();
+    fetchFavorites();
 
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    routeObserver.subscribe(this, ModalRoute.of(context)!);
+  }
 
-  Future<void> fetchFavoriteCrypto() async {
-    var db = await databaseConnection.openDb();
-    var results = await db.query('favorites', where: 'userId = ?', whereArgs: [id]);
+  @override
+  void dispose() {
+    routeObserver.unsubscribe(this);
+    super.dispose();
+  }
 
-    List<Map<String, dynamic>> favoriteCryptos = [];
-    
-    try {
-      final uri = Uri.parse(
-        'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=10&page=1&sparkline=false');
-
-      var cryptoCurrencies = await http.get(uri);
-
-      if(cryptoCurrencies.statusCode == 200) {
-
-
-      }
-
-    } catch(e) {
-      print(e);
-    }
-
+  @override
+  void didPopNext() {
+    // your refresh logic
+    fetchFavorites();
   }
 
 
+  Future<void> fetchFavorites() async {
+    final db = await databaseConnection.openDb();
+    final response = await db.query('favorites', where: 'userId = ?', whereArgs: [userId]);
 
+    print("Favoritos: $response");
+
+    setState(() {
+      favorites = response;
+    });
+
+  }
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 100,
-      child: PageView.builder(
-        itemCount: items.length,
-        itemBuilder: (context, index) {
-          return Text(items[index]);
-        },
-      ),
+
+
+    final cryptoProvider = Provider.of<CryptoProvider>(context);
+
+    List items = [];
+
+    if (cryptoProvider.isLoading) {
+      return Center(child: CircularProgressIndicator());
+    }
+
+    for(var crypto in cryptoProvider.cryptoData) {
+      for(var favorite in favorites) {
+        if(crypto['id'] == favorite['cryptoId']) {
+          items.add(crypto);
+        }
+      }
+    }
+
+    setState(() {
+      _done = true;
+    });
+    
+
+    return _isLoading 
+    ? Center(child: CircularProgressIndicator())
+    : _done && items.isEmpty
+    ? Text("Todavía no tienes cryptomonedas favoritas...")
+    : Column(
+      spacing: 5,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text("Tus criptomonedas", style: TextStyle(fontWeight: FontWeight.w500, fontSize: 15)),
+        SizedBox(
+          height: 90,
+          child: PageView.builder(
+            itemCount: items.length,
+            itemBuilder: (context, index) {
+              return Card(
+                elevation: 3,
+                child: ListTile(
+                    leading: Image.network(items[index]['image'], width: 40, height: 40),
+                    title: Text('${items[index]['name']} (${items[index]['symbol']})', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),),
+                    subtitle: Text('\$${items[index]['current_price'].toStringAsFixed(2)}', style: TextStyle(fontSize: 16)),
+                    onTap: () {
+                      Navigator.pushNamed(context, '/cryptocurrency');
+                    },
+                  
+                ),
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 }

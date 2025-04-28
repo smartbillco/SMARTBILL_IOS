@@ -128,7 +128,7 @@ class _ExpensesWeekState extends State<ExpensesWeek> {
             const TimeDivider(title: 'Últimos 7 días'),
             const SizedBox(height: 20),
             transactions.isEmpty
-            ? const Text("Todavía no tiene transacciones hoy", style: TextStyle(color: Colors.black54, fontSize: 18),)
+            ? const Text("No has tenido transacciones en 7 días", style: TextStyle(color: Colors.black54, fontSize: 18),)
             : Expanded(
               child: ListView.builder(
                 itemCount: transactions.length,
