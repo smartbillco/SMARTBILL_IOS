@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
@@ -18,6 +17,7 @@ class QrcodeLinkScreen extends StatefulWidget {
 
 class _QrcodeLinkScreenState extends State<QrcodeLinkScreen> {
   late InAppWebViewController webViewController;
+  bool isLoading = false;
   bool cloudflarePassed = false;
 
   //DIAN receipt variables

@@ -54,6 +54,7 @@ class _PDFListScreenState extends State<PDFListScreen> {
         return subtring;
       }
     }
+
   }
 
   //Extract values from pdfText

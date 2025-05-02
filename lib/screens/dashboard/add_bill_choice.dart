@@ -3,6 +3,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:smartbill/screens/camera/camera.dart';
 import 'package:smartbill/screens/dashboard/display_image.dart';
 import 'package:smartbill/services/pdf_reader.dart';
 import 'package:smartbill/screens/receipts.dart/receipt_screen.dart';
@@ -62,7 +63,7 @@ class _AddBillChoiceState extends State<AddBillChoice> {
       try {
         String filePath = fileResult.files.single.path!;
         File pdfFile = File(filePath);
-        //String fileName = fileResult.files.single.name.toLowerCase();
+        String fileName = fileResult.files.single.name.toLowerCase();
 
         await pdfService.saveExtractedText(pdfFile);
 
@@ -72,9 +73,11 @@ class _AddBillChoiceState extends State<AddBillChoice> {
         
         print("ERROR saving pdf: $e");
 
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("La factura ya existe, o hubo un error cargandola. Intente con otra factura.")));
+        if(mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("La factura ya existe, o hubo un error cargandola. Intente con otra factura.")));
+          Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => const ReceiptScreen()));
+        }
 
-        Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => const ReceiptScreen()));
       }
       
       
@@ -95,13 +98,19 @@ class _AddBillChoiceState extends State<AddBillChoice> {
 
       final image = File(pickedImage.path);
 
-      Navigator.push(context, MaterialPageRoute(builder: (context) => DisplayImageScreen(image: image, recognizedText: recognizedText.text)));
+
+
+      
 
       
     } else {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("No se selecciono imagen")));
     }
 
+  }
+
+  void _redirectCamera() async {
+    Navigator.push(context, MaterialPageRoute(builder: (context) => const CameraShotScreen()));
   }
 
 
@@ -138,8 +147,7 @@ class _AddBillChoiceState extends State<AddBillChoice> {
                 trailing: const Icon(Icons.arrow_forward_ios, color: Colors.grey),
               ),
             ),
-            isImageAvailable
-            ? Card(
+            Card(
               elevation: 4,
               margin: const EdgeInsets.symmetric(vertical: 8),
               child: ListTile(
@@ -149,8 +157,18 @@ class _AddBillChoiceState extends State<AddBillChoice> {
                 title: const Text("Subir imagen de factura"),
                 trailing: const Icon(Icons.arrow_forward_ios, color: Colors.grey),
               ),
+            ),
+            Card(
+              elevation: 4,
+              margin: const EdgeInsets.symmetric(vertical: 8),
+              child: ListTile(
+                onTap: _redirectCamera,
+                contentPadding: const EdgeInsets.all(10),
+                leading: const Icon(Icons.camera_alt, color: Colors.teal, size: 28),
+                title: const Text("Tomar foto  de factura"),
+                trailing: const Icon(Icons.arrow_forward_ios, color: Colors.grey),
+              ),
             )
-            : const SizedBox.shrink()
           ],
         ) 
       ),

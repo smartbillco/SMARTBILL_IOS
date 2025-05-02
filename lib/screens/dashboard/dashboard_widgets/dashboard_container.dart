@@ -124,17 +124,6 @@ class _DashboardContainerState extends State<DashboardContainer> {
   }
 }
 
-// MenuButton(
-//     icon: Icon(Icons.camera_alt, color: Colors.white, size: 35),
-//     text: "Fotografíar Factura",
-//     redirect: () {
-//       redirectToScreen(const CameraShotScreen());
-//     },
-//     colors: const [
-//        Color.fromARGB(255, 20, 82, 175),
-//        Color.fromARGB(255, 4, 34, 80)
-// ])
-
 
 class MenuButton extends StatelessWidget {
   final Icon icon;

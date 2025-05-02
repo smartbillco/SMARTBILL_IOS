@@ -20,11 +20,9 @@ class _DrawerMenuState extends State<DrawerMenu> {
 
 
   String formatPhoneNumber(String number) {
-    
-    if(number.length == 13) {
-      return "${number.substring(0,3)} (${number.substring(3,6)}) ${number.substring(6,13)}";
-    } // Remove non-numeric characters
-    return number; // Return as is if the format is not correct
+     
+    return "${number.substring(0,3)} (${number.substring(3,6)}) ${number.substring(6,9)} ${number.substring(9,)}";
+    // Return as is if the format is not correct
   }
 
   String? formatName(String? name) {

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:smartbill/screens/QRcode/qrcode_link_screen.dart';
 import 'package:smartbill/services/colombian_bill.dart';
 import 'package:smartbill/services/pdf.dart';
 import 'package:smartbill/services/peruvian_bill.dart';
@@ -25,6 +26,7 @@ class _QrcodeScreenState extends State<QrcodeScreen> {
   @override
   void initState() {
     super.initState();
+    print(widget.qrResult);
     pdfFormat();
   }
 
@@ -49,6 +51,7 @@ class _QrcodeScreenState extends State<QrcodeScreen> {
       setState(() {
         isPeru = false;
         isColombia = false;
+        pdfContent = {};
       });
     }
 
@@ -95,9 +98,13 @@ class _QrcodeScreenState extends State<QrcodeScreen> {
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
-              isColombia
-              ? _cardColombia(pdfContent, context, saveNewColombianBill)
-              : _cardPeru(pdfContent, context, saveNewPeruvianBill)
+            pdfContent.isEmpty
+            ? Text("Factura no válida, por favor intente con otra factura")
+            :  Expanded(
+                child: isColombia
+                ? _cardColombia(pdfContent, context, saveNewColombianBill)
+                : _cardPeru(pdfContent, context, saveNewPeruvianBill),
+              )
           ],
         ),
       ),
@@ -107,12 +114,43 @@ class _QrcodeScreenState extends State<QrcodeScreen> {
 
 
 Widget _cardColombia(Map pdfContent, context, Future<void> Function() saveFunction) {
+
+  bool hasDocumentKeyValue(String url) {
+    try {
+      Uri uri = Uri.parse(url);
+      final docKey = uri.queryParameters['documentkey'];
+      return docKey != null && docKey.isNotEmpty;
+
+    } catch(e) {
+      return false;
+    }
+
+  }
+
+  Future<void> _redirectToDianWebView() async {
+    String url = pdfContent['dian_link'].toString();
+
+    if(hasDocumentKeyValue(url)) {  
+      print("Link complete: $url");
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => QrcodeLinkScreen(uri: "https://${url}")));
+    } else {
+      print("Link not complete: $url");
+
+      String completeUrl = 'https://catalogo-vpfe.dian.gov.co/User/SearchDocument?DocumentKey=' + pdfContent['cufe'].toString();
+      print("Link add $completeUrl");
+
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => QrcodeLinkScreen(uri: completeUrl)));
+    }
+
+  }
+
+
   return SingleChildScrollView(
     child: SizedBox(
       child: Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       elevation: 4,
-      margin: const EdgeInsets.symmetric(vertical: 40, horizontal: 20),
+      margin: const EdgeInsets.symmetric(vertical: 40, horizontal: 10),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: 
@@ -127,13 +165,24 @@ Widget _cardColombia(Map pdfContent, context, Future<void> Function() saveFuncti
             const Divider(),
             const SizedBox(height: 10),
             _buildRow("NIT", pdfContent['nit']),
-            _buildRow("Id Clientes", pdfContent['customer_id']),
+            _buildRow("Id Cliente", pdfContent['customer_id']),
             _buildRow("Sin IVA", NumberFormat('#,##0', 'en_US').format(double.parse(pdfContent['amount_before_iva'])).toString()),
             _buildRow("IVA", NumberFormat('#,##0', 'en_US').format(double.parse(pdfContent['iva'])).toString()),
             _buildRow("Pago", NumberFormat('#,##0', 'en_US').format(double.parse(pdfContent['total_amount'])).toString()),
             _buildRow("Fecha", pdfContent['date']),
-            _buildRow("Hora", pdfContent['time']),
             _buildRow("CUFE", pdfContent['cufe']),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text("Descarga", style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 18)),
+                SizedBox(
+                  width: 200,
+                  child: TextButton(onPressed: _redirectToDianWebView, child: Text("Descargar factura desde la DIAN", style: const TextStyle(fontWeight: FontWeight.w400, fontSize: 16, color: Colors.blue,)),
+                  ),
+                ),
+              ],
+            ),
+
             const SizedBox(height: 30),
             SizedBox(
               width: MediaQuery.of(context).size.width - 10,
@@ -162,7 +211,7 @@ Widget _cardPeru(pdfContent, context, Future<void> Function() saveFunction) {
       child: Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       elevation: 4,
-      margin: const EdgeInsets.symmetric(vertical: 40, horizontal: 15),
+      margin: const EdgeInsets.symmetric(vertical: 40, horizontal: 10),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -211,7 +260,7 @@ Widget _buildRow(String title, String value) {
           style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
         ),
         SizedBox(
-          width: 140,
+          width: 200,
           child: Text(
             value,
             style: const TextStyle(fontWeight: FontWeight.w400, fontSize: 16),
