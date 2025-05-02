@@ -9,7 +9,7 @@ import 'package:smartbill/services/db.dart';
 class PdfService {
 
   Future<dynamic> extractTextfromPdf(File pdf) async {
-    final uri = Uri.parse('http://207.244.226.48:8086/ocr/extract-details/pdf');
+    final uri = Uri.parse('http://213.199.60.150:8086/ocr/extract-details/pdf');
 
     var request = http.MultipartRequest('POST', uri);
 

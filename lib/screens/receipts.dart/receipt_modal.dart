@@ -1,7 +1,12 @@
+import 'dart:io';
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:smartbill/screens/receipts.dart/receipt_screen.dart';
 import 'package:smartbill/screens/receipts.dart/receipt_widgets/delete_dialog.dart';
+import 'package:smartbill/services/db.dart';
+import 'package:smartbill/services/ocr_receipts.dart';
 
 class BillDetailScreen extends StatefulWidget {
   final Map receipt;
@@ -12,12 +17,14 @@ class BillDetailScreen extends StatefulWidget {
 }
 
 class _BillDetailScreenState extends State<BillDetailScreen> {
-
+  OcrReceiptsService ocrService = OcrReceiptsService();
   List textPdf = [];
+  Uint8List? imageRendered;
 
   @override
   void initState() {
     super.initState();
+    getImageForReceipt();
     
   }
 
@@ -27,6 +34,16 @@ class _BillDetailScreenState extends State<BillDetailScreen> {
       context,
       MaterialPageRoute(builder: (context) => const ReceiptScreen()),
     );
+  }
+
+  Future<void> getImageForReceipt() async {
+
+    Uint8List image = await ocrService.fetchImage(widget.receipt['_id']);
+    print(image);
+    setState(() {
+      imageRendered = image;
+    });
+
   }
 
 
@@ -90,6 +107,9 @@ class _BillDetailScreenState extends State<BillDetailScreen> {
           ),
           child: Column(
             children: [
+              imageRendered != null
+              ? Image.memory(imageRendered!, width: 200,)
+              : SizedBox.shrink(),
               const Icon(Icons.check, size: 60, color: Colors.green,),
               const SizedBox(height: 20,),
               Text("Factura: ${widget.receipt['id_bill']}", style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),),
@@ -131,8 +151,6 @@ class _BillDetailScreenState extends State<BillDetailScreen> {
                   )
                 ],
               )
-              
-          
             ],
           ),
         ),

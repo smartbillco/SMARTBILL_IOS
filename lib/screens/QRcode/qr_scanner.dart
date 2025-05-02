@@ -21,7 +21,7 @@ class _QRScannerState extends State<QRScanner> {
 
 
   void _showSnackbarError(String error) {
-    var snackbar = SnackBar(content: Text("Ha ocurrido un error: $error"));
+    var snackbar = SnackBar(content: Text("Ocurrió un error: $error"), duration: Duration(seconds: 6),);
     ScaffoldMessenger.of(context).showSnackBar(snackbar);
   }
 
@@ -68,31 +68,42 @@ class _QRScannerState extends State<QRScanner> {
           controller: scannerController,
           onDetect: (BarcodeCapture capture) async {
             final List<Barcode> barcodes = capture.barcodes;
-      
-            final qrResult = barcodes.first;
-      
-            if (qrResult.rawValue != null) {
 
-              _timeoutTimer?.cancel(); // Stop timeout if QR is scanned
-              _scanning = false;
-              //To do with code
-              await scannerController
-                .stop()
-                .then((value) => scannerController.dispose())
-                .then((value) {
-                  var isUri = checkIfIsUri(qrResult.rawValue);
-                  if(isUri) {
-                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => QrcodeLinkScreen(uri: qrResult.rawValue)));
-                  } else {
-                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => QrcodeScreen(qrResult: qrResult.rawValue!)));
-                  }
-                    
-                });
-                            
+            if(barcodes.first.format != BarcodeFormat.qrCode) {
+              _showSnackbarError("El código detectado no es QR. Verifique que el código es válido o no hay un código de barras en la factura.");
+              Navigator.pop(context);
+              scannerController.dispose();
+              
             } else {
-                  _showSnackbarError("ERROR");
+              print("Formato QR");
+              final qrResult = barcodes.first;
+      
+              if (qrResult.rawValue != null) {
+
+                _timeoutTimer?.cancel(); // Stop timeout if QR is scanned
+                _scanning = false;
+                //To do with code
+                await scannerController
+                  .stop()
+                  .then((value) => scannerController.dispose())
+                  .then((value) {
+                    var isUri = checkIfIsUri(qrResult.rawValue);
+                    if(isUri) {
+                      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => QrcodeLinkScreen(uri: qrResult.rawValue)));
+                    } else {
+                      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => QrcodeScreen(qrResult: qrResult.rawValue!)));
+                    }
+                      
+                  });
+                              
+              } else {
+                    _showSnackbarError("ERROR");
+                
+              }
               
             }
+      
+            
             //for(final barcode in barcodes) {
             //print(barcode.rawValue);
             //}

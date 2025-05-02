@@ -96,17 +96,19 @@ import 'package:path/path.dart';
         ''');
 
         //Version 6
-        await db.execute('''
-          CREATE TABLE IF NOT EXISTS ocr_receipts (
+        await db.execute('''CREATE TABLE IF NOT EXISTS ocr_receipts (
             _id INTEGER PRIMARY KEY AUTOINCREMENT,
+            userId TEXT NOT NULL,
             image BLOB,
             extracted_text TEXT NOT NULL,
+            date TEXT NOT NULL,
             company TEXT,
             nit TEXT NOT NULL,
-            user_document text,
-            amount real
+            user_document text NOT NULL,
+            amount real NOT NULL
           )
         ''');
+
       },
       onUpgrade: (db, oldVersion, newVersion) async {
         if (oldVersion < 2) {
@@ -185,16 +187,20 @@ import 'package:path/path.dart';
             )
           ''');
         }
+        //version 5
         if(oldVersion < 6) {
           await db.execute('ALTER TABLE colombian_bill ADD COLUMN dian_link TEXT');
         }
 
+        //Version 6
         if(oldVersion < 7) {
           await db.execute('''
           CREATE TABLE IF NOT EXISTS ocr_receipts (
             _id INTEGER PRIMARY KEY AUTOINCREMENT,
+            userId TEXT NOT NULL,
             image BLOB,
             extracted_text TEXT NOT NULL,
+            date TEXT NOT NULL,
             company TEXT,
             nit TEXT NOT NULL,
             user_document text NOT NULL,

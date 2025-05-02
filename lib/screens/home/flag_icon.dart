@@ -43,15 +43,38 @@ class _FlagIconState extends State<FlagIcon> {
 
 
     return PopupMenuButton(
-        style: const ButtonStyle(
-            iconColor: WidgetStatePropertyAll(Colors.white),
-            iconSize: WidgetStatePropertyAll(30)),
         icon: Image(image: AssetImage(_currentCountry.flag)),
+        onSelected: (value) {
+          switch (value) {
+            case 1:
+              changeFlag(colombia);
+              break;
+            case 2:
+              changeFlag(peru);
+              break;
+
+            case 3:
+              changeFlag(eu);
+              break;
+            case 4:
+              changeFlag(chile);
+              break;
+            case 5:
+              changeFlag(panama);
+              break;
+            case 6:
+              changeFlag(ecuador);
+              break;
+            case 7:
+              changeFlag(usa);
+              break;
+
+          }
+        },
+        initialValue: _currentCountry.id,
         itemBuilder: (BuildContext context) => [
               PopupMenuItem(
-                onTap: () {
-                  changeFlag(colombia);
-                },
+                value: 1,
                 child: Row(
                   children: <Widget>[
                     Image(image: AssetImage(colombia.flag), width: 40, height: 40,),
@@ -61,9 +84,7 @@ class _FlagIconState extends State<FlagIcon> {
                 )
               ),
               PopupMenuItem(
-                onTap: () {
-                  changeFlag(peru);
-                },
+                value: 2,
                 child: Row(
                   children: <Widget>[
                     Image(image: AssetImage(peru.flag), width: 40, height: 40,),
@@ -73,9 +94,7 @@ class _FlagIconState extends State<FlagIcon> {
                 )
               ),
               PopupMenuItem(
-                onTap: () {
-                  changeFlag(eu);
-                },
+                value: 3,
                 child: Row(
                   children: <Widget>[
                     Image(image: AssetImage(eu.flag), width: 40, height: 40,),
@@ -85,9 +104,7 @@ class _FlagIconState extends State<FlagIcon> {
                 )
               ),
               PopupMenuItem(
-                onTap: () {
-                  changeFlag(chile);
-                },
+                value: 4,
                 child: Row(
                   children: <Widget>[
                     Image(image: AssetImage(chile.flag), width: 40, height: 40,),
@@ -97,9 +114,7 @@ class _FlagIconState extends State<FlagIcon> {
                 )
               ),
               PopupMenuItem(
-                onTap: () {
-                  changeFlag(panama);
-                },
+                value: 5,
                 child: Row(
                   children: <Widget>[
                     Image(image: AssetImage(panama.flag), width: 40, height: 40,),
@@ -109,9 +124,7 @@ class _FlagIconState extends State<FlagIcon> {
                 )
               ),
               PopupMenuItem(
-                onTap: () {
-                  changeFlag(ecuador);
-                },
+                value: 6,
                 child: Row(
                   children: <Widget>[
                     Image(image: AssetImage(ecuador.flag), width: 40, height: 40,),
@@ -121,9 +134,7 @@ class _FlagIconState extends State<FlagIcon> {
                 )
               ),
               PopupMenuItem(
-                onTap: () {
-                  changeFlag(usa);
-                },
+                value: 7,
                 child: Row(
                   children: <Widget>[
                     Image(image: AssetImage(usa.flag), width: 40, height: 40,),

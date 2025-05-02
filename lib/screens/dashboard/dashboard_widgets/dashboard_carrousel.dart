@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:smartbill/services/crypto_provider.dart';
 import 'package:smartbill/services/db.dart';
@@ -64,7 +65,6 @@ class _DashboardCarrouselState extends State<DashboardCarrousel> with RouteAware
   @override
   Widget build(BuildContext context) {
 
-
     final cryptoProvider = Provider.of<CryptoProvider>(context);
 
     List items = [];
@@ -94,7 +94,7 @@ class _DashboardCarrouselState extends State<DashboardCarrousel> with RouteAware
       spacing: 5,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text("Tus criptomonedas", style: TextStyle(fontWeight: FontWeight.w500, fontSize: 15)),
+        Text("Tus criptomonedas", style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16)),
         SizedBox(
           height: 90,
           child: PageView.builder(
@@ -105,7 +105,7 @@ class _DashboardCarrouselState extends State<DashboardCarrousel> with RouteAware
                 child: ListTile(
                     leading: Image.network(items[index]['image'], width: 40, height: 40),
                     title: Text('${items[index]['name']} (${items[index]['symbol']})', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),),
-                    subtitle: Text('\$${items[index]['current_price'].toStringAsFixed(2)}', style: TextStyle(fontSize: 16)),
+                    subtitle: Text(NumberFormat("#,##0.00").format(items[index]['current_price']), style: TextStyle(fontSize: 16)),
                     onTap: () {
                       Navigator.pushNamed(context, '/cryptocurrency');
                     },

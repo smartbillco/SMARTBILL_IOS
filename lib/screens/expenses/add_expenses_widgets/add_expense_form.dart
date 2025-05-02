@@ -65,8 +65,7 @@ class _AddExpensesFormState extends State<AddExpensesForm> {
         padding: const EdgeInsets.all(25),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: 
-          [
+          children: [
             const Text("Agregar gasto", style: TextStyle(fontWeight: FontWeight.w300, fontSize: 30),),
             const SizedBox(height: 40),
             Form(

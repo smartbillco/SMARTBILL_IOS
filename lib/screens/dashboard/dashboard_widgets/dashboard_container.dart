@@ -34,21 +34,22 @@ class _DashboardContainerState extends State<DashboardContainer> {
     final String? phone = FirebaseAuth.instance.currentUser!.phoneNumber;
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 20),
+      padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 18),
       child: Column(
+        spacing: 8,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const DashboardText(),
           //Carrousel
           const DashboardCarrousel(),
-          SizedBox(height: 20),
+          SizedBox(height: 5),
           //First row of navigation
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               MenuButton(
-                  icon: const Icon(Icons.arrow_downward, color: Colors.white, size: 35),
-                  text: "Agregar ingreso",
+                  icon: Icon(Icons.account_balance_wallet, color: Colors.white, size: 35),
+                  text: "Gestionar balance",
                   redirect: () {
                     redirectToScreen(const ExpensesScreen());
                   },
@@ -70,7 +71,6 @@ class _DashboardContainerState extends State<DashboardContainer> {
               ),
             ]
           ),
-          const SizedBox(height: 14),
 
           //Second row of navigation
           Row(
@@ -96,7 +96,6 @@ class _DashboardContainerState extends State<DashboardContainer> {
                 ])
             ],
           ),
-          const SizedBox(height: 14),
 
           //Third row of navigation
           Row(
@@ -116,7 +115,6 @@ class _DashboardContainerState extends State<DashboardContainer> {
               : const SizedBox.shrink()
             ],
           ),
-          const SizedBox(height: 50,)
 
         ],
       ),
@@ -143,7 +141,7 @@ class MenuButton extends StatelessWidget {
 
 
     return Container(
-      width: MediaQuery.of(context).size.width * 0.41,
+      width: MediaQuery.of(context).size.width * 0.42,
       height: 160,
       decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
