@@ -5,6 +5,7 @@ import 'package:smartbill/screens/receipts.dart/receipt_widgets/delete_dialog.da
 import 'package:smartbill/screens/receipts.dart/receipt_widgets/searchbar.dart';
 import 'package:smartbill/screens/receipts.dart/receipt_widgets/total_sum.dart';
 import 'package:smartbill/services/colombian_bill.dart';
+import 'package:smartbill/services/ocr_receipts.dart';
 import 'package:smartbill/services/pdf_reader.dart';
 import 'package:smartbill/services/peruvian_bill.dart';
 import 'package:smartbill/services/xml/xml.dart';
@@ -26,6 +27,7 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
   final PeruvianBill peruvianBill = PeruvianBill();
 
   //Handle of XML stored
+  final OcrReceiptsService ocrService = OcrReceiptsService();
   final XmlColombia xmlColombia = XmlColombia();
   final XmlPeru xmlPeru = XmlPeru();
   final XmlPanama xmlPanama = XmlPanama();
@@ -41,6 +43,7 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
 
   //Get all XML files from sqlite
   void getReceipts() async {
+    var ocrReceipts = await ocrService.fetchOcrReceipts();
     var xmlFiles = await xmlhandler.getXmls();
     var pdfFiles = await _pdfService.fetchAllPdfs();
     List myFiles = [];
@@ -48,7 +51,10 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
     double totalPaidPeru = 0;
     double totalPaidPanama = 0;
 
-   
+    for(var item in ocrReceipts) {
+      totalPaidColombia += double.parse(item['price']);
+      myFiles.add(item);
+    }
 
 
     for (var item in xmlFiles) {

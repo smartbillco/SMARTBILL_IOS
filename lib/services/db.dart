@@ -9,7 +9,7 @@ import 'package:path/path.dart';
     var databasesPath = await getDatabasesPath();
     var path = join(databasesPath, 'smartbill.db');
 
-    return db = await openDatabase(path, version: 5,
+    return db = await openDatabase(path, version: 6,
       onCreate: (Database db, int version) async {
         // Version 1
         await db.execute('''
@@ -94,6 +94,21 @@ import 'package:path/path.dart';
             total_amount REAL
           )
         ''');
+
+        //Version 6
+        await db.execute('''CREATE TABLE IF NOT EXISTS ocr_receipts (
+            _id INTEGER PRIMARY KEY AUTOINCREMENT,
+            userId TEXT NOT NULL,
+            image BLOB,
+            extracted_text TEXT NOT NULL,
+            date TEXT NOT NULL,
+            company TEXT,
+            nit TEXT NOT NULL,
+            user_document text NOT NULL,
+            amount real NOT NULL
+          )
+        ''');
+
       },
       onUpgrade: (db, oldVersion, newVersion) async {
         if (oldVersion < 2) {
@@ -172,8 +187,26 @@ import 'package:path/path.dart';
             )
           ''');
         }
+        //version 5
         if(oldVersion < 6) {
           await db.execute('ALTER TABLE colombian_bill ADD COLUMN dian_link TEXT');
+        }
+
+        //Version 6
+        if(oldVersion < 7) {
+          await db.execute('''
+          CREATE TABLE IF NOT EXISTS ocr_receipts (
+            _id INTEGER PRIMARY KEY AUTOINCREMENT,
+            userId TEXT NOT NULL,
+            image BLOB,
+            extracted_text TEXT NOT NULL,
+            date TEXT NOT NULL,
+            company TEXT,
+            nit TEXT NOT NULL,
+            user_document text NOT NULL,
+            amount real NOT NULL
+          )
+        ''');
         }
       },
     );

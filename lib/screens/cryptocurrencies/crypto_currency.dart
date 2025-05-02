@@ -3,8 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:smartbill/services/db.dart';
-
 import '../../models/cryptos.dart';
+import 'package:intl/intl.dart';
 
 class CryptoListScreen extends StatefulWidget {
   const CryptoListScreen({super.key});
@@ -94,7 +94,7 @@ class _CryptoListScreenState extends State<CryptoListScreen> {
                         return ListTile(
                           leading: Image.network(crypto.image, width: 32, height: 32),
                           title: Text('${crypto.name} (${crypto.symbol.toUpperCase()})'),
-                          subtitle: Text('\$${crypto.price.toStringAsFixed(2)}'),
+                          subtitle: Text(NumberFormat("#,##0.00").format(crypto.price)),
                           trailing: isFavorite
                               ? Icon(Icons.star, color: Colors.amber)
                               : Icon(Icons.star_border),
@@ -112,13 +112,13 @@ class _CryptoListScreenState extends State<CryptoListScreen> {
                                 favoriteIds.add(crypto.id);
                               });
                             }
-                          },
-                        );
-                      },
-                          ),
+                        },
+                      );
+                    },
                 ),
-              ],
-            ),
-          );
+              ),
+            ],
+          ),
+      );
   }
 }

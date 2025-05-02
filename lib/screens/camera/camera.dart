@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:camera/camera.dart';
+import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
+import 'package:smartbill/screens/dashboard/display_image.dart';
 
 class CameraShotScreen extends StatefulWidget {
   const CameraShotScreen({super.key});
@@ -12,7 +14,7 @@ class CameraShotScreen extends StatefulWidget {
 class _CameraShotScreenState extends State<CameraShotScreen> {
   late List<CameraDescription> _cameras;
   CameraController? _controller;
-  XFile? _imageFile;
+  File? _imageFile;
 
   @override
   void initState() {
@@ -29,10 +31,39 @@ class _CameraShotScreenState extends State<CameraShotScreen> {
 
   Future<void> _takePicture() async {
     if (_controller == null || !_controller!.value.isInitialized) return;
-    final image = await _controller!.takePicture();
-    setState(() {
-      _imageFile = image;
-    });
+    final XFile imageFile = await _controller!.takePicture();
+
+    final inputImage = InputImage.fromFilePath(imageFile.path);
+    final textRecognizer = TextRecognizer(script: TextRecognitionScript.latin);
+    final RecognizedText recognizedText = await textRecognizer.processImage(inputImage);
+    
+    File image = File(imageFile.path);
+
+    print(recognizedText.text);
+
+    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => DisplayImageScreen(image: image, recognizedText: recognizedText.text)));
+
+    
+  }
+
+  Future<void> _redirectToDisplayImage(XFile? takenImage) async {
+
+    print("redirectToDisplayImage called with: ${takenImage?.path}");
+    if(takenImage != null) {
+      final inputImage = InputImage.fromFilePath(takenImage.path);
+      final textRecognizer = TextRecognizer(script: TextRecognitionScript.latin);
+      final recognizedText = await textRecognizer.processImage(inputImage);
+
+      final image = File(takenImage.path);
+
+      print(recognizedText);
+
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => DisplayImageScreen(image: image, recognizedText: recognizedText.text)));
+    
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("No se selecciono imagen")));
+    }
+    
   }
 
   @override

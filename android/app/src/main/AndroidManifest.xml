@@ -8,6 +8,7 @@
     <application
         android:requestLegacyExternalStorage="true"
         android:usesCleartextTraffic="true"
+        android:enableOnBackInvokedCallback="true"
         android:networkSecurityConfig="@xml/network_security_config"
         android:label="Smartbill"
         android:name="${applicationName}"

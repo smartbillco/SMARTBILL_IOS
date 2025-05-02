@@ -60,13 +60,19 @@ class _AddBillChoiceState extends State<AddBillChoice> {
     if (fileResult != null) {
 
       try {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Subiendo PDF..."), duration: Duration(seconds: 5),));
+
         String filePath = fileResult.files.single.path!;
         File pdfFile = File(filePath);
         //String fileName = fileResult.files.single.name.toLowerCase();
 
         await pdfService.saveExtractedText(pdfFile);
 
-        Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => const ReceiptScreen()));
+        Future.delayed(Duration(seconds: 4), () {
+          if(mounted) {
+            Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => const ReceiptScreen()));
+          }
+        });
 
       } catch(e) {
         
@@ -95,7 +101,7 @@ class _AddBillChoiceState extends State<AddBillChoice> {
 
       final image = File(pickedImage.path);
 
-      Navigator.push(context, MaterialPageRoute(builder: (context) => DisplayImageScreen(image: image, recognizedText: recognizedText.text)));
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => DisplayImageScreen(image: image, recognizedText: recognizedText.text)));
 
       
     } else {

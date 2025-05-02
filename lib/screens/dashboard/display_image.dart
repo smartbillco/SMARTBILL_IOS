@@ -1,11 +1,15 @@
 import 'dart:io';
+import 'dart:typed_data';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:smartbill/models/ocr_receipts.dart';
+import 'package:smartbill/screens/receipts.dart/receipt_screen.dart';
 
 class DisplayImageScreen extends StatefulWidget {
-
   final File? image;
   final String? recognizedText;
+
   const DisplayImageScreen({super.key, required this.image, required this.recognizedText});
 
   @override
@@ -14,51 +18,147 @@ class DisplayImageScreen extends StatefulWidget {
 
 
 class _DisplayImageScreenState extends State<DisplayImageScreen> {
+  final String userId = FirebaseAuth.instance.currentUser!.uid;
 
+  List<String> ocrLines = [];
   String nit = '';
-  String code = '';
+  String date = '';
   String customer = '';
+  String company = '';
   double total = 0;
+  bool _isLoading = false;
 
   @override
   void initState() {
-    // TODO: implement initState
+  
     super.initState();
     _extractData();
   }
 
 
   void _extractData() {
-    // final RegExp companyRegex = RegExp(r'\b(NIT|NIF)\s*([\w\d.-]+)', caseSensitive: false);
-    // final RegExp idRegex = RegExp(r'\b\d{10}\b');
-    // final RegExp dateRegex = RegExp(r'\b\d{1,2}[/.-]\d{1,2}[/.-]\d{2,4}\b');
+    List<String> extractedLines = widget.recognizedText!.split('\n');
 
-    final lines = widget.recognizedText!.split('\n');
-    final regex = RegExp(r'^[A-Za-z]\d{3}-\d{5}$');
+    RegExp dateRegex = RegExp(r'\b(\d{2}[/-]\d{2}[/-]\d{2,4}|\d{4}[/-]\d{2}[/-]\d{2})\b');
+    RegExp nitRegex = RegExp(r'NIT[:\s.\-]*?([\d.]+-\d+|\d+)', caseSensitive: false);
+    RegExp ccRegex = RegExp(r'C\.?C\.?[:\s.\-]*?(\d[\d.]*)', caseSensitive: false);
+    //In case nit is not explicit
+    RegExp unlabeledNitRegex = RegExp(r'\b\d{9}(-\d)?\b');
+    RegExp moneyRegex = RegExp(r'^\d{1,3}(?:[.,]\d{3})*(?:[.,]\d{2})?$');
 
-    String companyid = '';
-    String customerId = '';
-    String billCode = '';
-    
-    for(var line in lines) {
+    List<String> dates = [];
+    List<String> nitValues = [];
+    List<String> ccValues = [];
+    List<double> moneyValues = [];
+    String companyName = '';
 
-      companyid = line.toLowerCase().startsWith('nit') && !line.toLowerCase().contains('cc') ? line : 'No encontrado';
-      customerId = line.toLowerCase().contains('cc') ? line : 'No encontrado';
-      billCode = regex.hasMatch(line) ? line : 'No encontrado';
+    for (var item in extractedLines) {
+      // Check for dates
+      for (final match in dateRegex.allMatches(item)) {
+        dates.add(match.group(0)!);
+      }
 
-      print(companyid);
+      // Extract NIT
+      final nitMatch = nitRegex.firstMatch(item);
+      if (nitMatch != null) {
+        String rawNit = nitMatch.group(1)!;
+        String cleanedNit = rawNit.replaceAll('.', '');
+        nitValues.add(cleanedNit);
+      }
 
+      // Extract unlabeled NITs (if not already captured)
+      final unlabeledMatches = unlabeledNitRegex.allMatches(item);
+      for (final match in unlabeledMatches) {
+        String candidate = match.group(0)!;
+        if (!nitValues.contains(candidate)) {
+          nitValues.add(candidate);
+        }
+      }
+
+      // Extract CC
+      final ccMatch = ccRegex.firstMatch(item);
+      if (ccMatch != null) {
+        String rawCc = ccMatch.group(1)!;
+        String cleanedCc = rawCc.replaceAll('.', '');
+        ccValues.add(cleanedCc);
+      }
+
+
+      // Check for money values
+      if (moneyRegex.hasMatch(item.trim())) {
+      double? value = double.tryParse(item.replaceAll(RegExp(r'[.,]'), '').replaceAll(',', '.'));
+
+      if (value != null && value.toString().length < 10) {
+        moneyValues.add(value);
+      }
+    }
     }
 
+    //Pick first line as company name
+    if(extractedLines[0] != '') {
+      companyName = extractedLines[0];
+    } else {
+      companyName = extractedLines[1];
+    }
+    
+
+    double totalAmount = moneyValues.isNotEmpty ? moneyValues.reduce((a, b) => a > b ? a : b) : 0;
+
+    print('Dates: $dates');
+    print('NIT Value: $nitValues');
+    print('CC Value: $ccValues');
+    print('Amount: $totalAmount');
+    print("Company name: $companyName");
+
+    if(dates.isEmpty || nitValues.isEmpty) {
+      print("Faltante");
+      setState(() {
+        ocrLines = ["Parece que la información no se pudo extraer bien. Intenta con una foto foto de mejor resolución."];
+
+      });
+    } else {
+        setState(() {
+        date = dates.isEmpty ? 'No encontrado' : dates.last;
+        nit = nitValues.first;
+        customer = ccValues.isEmpty ? '22222222222' : ccValues.first;
+        total = totalAmount;
+        company = companyName;
+        ocrLines = extractedLines;
+        
+      });
+
+    }
+    
+  }
+
+  Future<void> _saveNewOcrReceipt() async {
+
     setState(() {
-      nit = companyid;
-      customer = customerId;
-      code = billCode;
+      _isLoading = true;
     });
 
-    print("Nit $nit");
-    print("Cliente: $customer");
-
+    final Uint8List convertedImage = await widget.image!.readAsBytes();
+    print(convertedImage);
+    final OcrReceipts ocrReceipts = OcrReceipts(userId: userId, image: convertedImage, extractedText: widget.recognizedText!, date: date, company: company, nit: nit, userDocument: customer, amount: total);
+   
+    try {
+      String result = await ocrReceipts.saveOcrReceipt();
+      if(result.startsWith("Hubo un error")) {
+        print(result);
+      } else {
+        print("Success! $result");
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Factura descargada")));
+        Future.delayed(Duration(seconds: 3), () => Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const ReceiptScreen())));
+        
+      }
+      
+    } catch(e) {
+      print("Error saving ocr: $e");
+    }finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
 
@@ -66,19 +166,25 @@ class _DisplayImageScreenState extends State<DisplayImageScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Imagen"),
+        title: const Text("Imagen"),
       ),
-      body: Padding(
-        padding: EdgeInsets.all(20),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
+      body: _isLoading
+      ? const CircularProgressIndicator()
+      : SingleChildScrollView(
+        padding: const EdgeInsets.all(30),
+        child: ocrLines.isEmpty
+        ? const Center(child: CircularProgressIndicator())
+        : Column(
             children: [
-              widget.image != null ? Image.file(widget.image!, width: 250,) : Center(child: Text("La imagen no se pudo cargar")),
+              TextButton(onPressed: _saveNewOcrReceipt,
+                style: const ButtonStyle(backgroundColor: WidgetStatePropertyAll(Colors.green)),
+                child: const Text("Guardar factura", style: TextStyle(color: Colors.white),),
+                ),
               const SizedBox(height: 20),
-              Text(widget.recognizedText!)
+              widget.image != null ? Image.file(widget.image!, width: 320,) : const Center(child: Text("La imagen no se pudo cargar")),
+              const SizedBox(height: 20),
+              for (var line in ocrLines) Text(line),
             ],
-          ),
         ),
       ),
     );

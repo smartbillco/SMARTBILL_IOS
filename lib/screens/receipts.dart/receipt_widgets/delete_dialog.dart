@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:smartbill/services/colombian_bill.dart';
+import 'package:smartbill/services/ocr_receipts.dart';
 import 'package:smartbill/services/pdf.dart';
 import 'package:smartbill/services/pdf_reader.dart';
 import 'package:smartbill/services/peruvian_bill.dart';
@@ -17,6 +18,7 @@ class DeleteDialogWidget extends StatefulWidget {
 }
 
 class _DeleteDialogWidgetState extends State<DeleteDialogWidget> {
+  final OcrReceiptsService ocrService = OcrReceiptsService();
   Xmlhandler xmlhandler = Xmlhandler();
   PdfHandler pdfHandler = PdfHandler();
   PdfService pdfService = PdfService();
@@ -35,6 +37,8 @@ class _DeleteDialogWidgetState extends State<DeleteDialogWidget> {
       } else if (item['type'] == 'bill_pen') {
         await peruvianBill.deleteBill(item['_id']);
 
+      } else if(item['currency'] == 'OCR') {
+        await ocrService.deleteOcrReceipt(item['_id']);
       }
       else {
         await xmlhandler.deleteXml(item['_id']);

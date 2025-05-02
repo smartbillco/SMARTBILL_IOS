@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:smartbill/screens/home/app_bar_widgets.dart';
 import 'package:smartbill/screens/home/crypto_list.dart';
 import 'package:smartbill/screens/home/flag_icon.dart';
@@ -19,7 +20,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Country _currentCountry = Country(id: 1, flag: "assets/images/colombian_flag.png", name: "Colombia", currency: "COP");
 
-  String data = "\$...";
+  String data = "0";
 
   Future<void> onCountryChange(Country newCountry) async {
 
@@ -74,16 +75,15 @@ class _HomeScreenState extends State<HomeScreen> {
           FlagIcon(changeFlag: onCountryChange),
         ],
         bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(170),
+          preferredSize: const Size.fromHeight(160),
           child: Container(
             padding: const EdgeInsets.only(bottom: 30),
             child: Column(
+              spacing: 10,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const Text("Valor del dolar", style: TextStyle(color: Colors.white)),
-                const SizedBox(height: 20),
-                Text("${_currentCountry.currency} $data", style: const TextStyle(color: Colors.white, fontSize: 42, fontWeight: FontWeight.bold)),
-                const SizedBox(height: 7),
+                Text("${_currentCountry.currency} ${NumberFormat("#,##0.00").format(double.parse(data))}", style: const TextStyle(color: Colors.white, fontSize: 42, fontWeight: FontWeight.bold)),
               ],
             ),
           )
