@@ -23,7 +23,7 @@ class Trm {
       }
 
     } catch(e) {
-      return jsonDecode("There was an error: $e");
+      return {'error':"There was an error: $e"};
     }
   }
 }

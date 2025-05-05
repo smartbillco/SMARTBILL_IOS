@@ -77,9 +77,14 @@ class _DashboardScreenState extends State<DashboardScreen> with RouteAware {
       }
       
     }
-    setState(() {
-      balance = totalSum - totalSubs;
-    });
+
+    if(mounted) {
+      setState(() {
+        balance = totalSum - totalSubs;
+      });
+
+    }
+    
   }
 
   //Get echange currency

@@ -53,13 +53,15 @@ class OcrReceiptsService {
     print("Delete receipt");
   }
 
-  Future<Uint8List> fetchImage(int id) async {
+  Future<Uint8List?> fetchImage(int id) async {
     final db = await DatabaseConnection().openDb();
-    final result = await db.rawQuery(
-      'SELECT image FROM ocr_receipts WHERE _id = ?',
-      [id],
-    );
-    return result.first['image'] as Uint8List;
+    final result = await db.rawQuery('SELECT image FROM ocr_receipts WHERE _id = ?', [id]);
+    if(result != null) {
+      return result[0]['image'] as Uint8List;
     }
+
+    return null;
+    
+  }
 
 }

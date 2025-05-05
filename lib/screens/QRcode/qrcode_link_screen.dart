@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:smartbill/screens/PDFList/pdf_list.dart';
-import 'package:smartbill/screens/QRcode/confirmDownload/confirm_download.dart';
 import 'package:smartbill/screens/dashboard/dashboard.dart';
 
 class QrcodeLinkScreen extends StatefulWidget {

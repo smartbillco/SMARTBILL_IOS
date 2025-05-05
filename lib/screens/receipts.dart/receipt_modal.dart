@@ -1,11 +1,9 @@
-import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:smartbill/screens/receipts.dart/receipt_screen.dart';
 import 'package:smartbill/screens/receipts.dart/receipt_widgets/delete_dialog.dart';
-import 'package:smartbill/services/db.dart';
 import 'package:smartbill/services/ocr_receipts.dart';
 
 class BillDetailScreen extends StatefulWidget {
@@ -24,7 +22,7 @@ class _BillDetailScreenState extends State<BillDetailScreen> {
   @override
   void initState() {
     super.initState();
-    getImageForReceipt();
+    if(widget.receipt['currency'] == 'OCR') getImageForReceipt();
     
   }
 
@@ -38,12 +36,13 @@ class _BillDetailScreenState extends State<BillDetailScreen> {
 
   Future<void> getImageForReceipt() async {
 
-    Uint8List image = await ocrService.fetchImage(widget.receipt['_id']);
-    print(image);
-    setState(() {
-      imageRendered = image;
-    });
+    Uint8List? image = await ocrService.fetchImage(widget.receipt['_id']);
 
+    if(image != null) {
+      setState(() {
+        imageRendered = image;
+      });
+    }
   }
 
 

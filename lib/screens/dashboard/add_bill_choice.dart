@@ -65,7 +65,7 @@ class _AddBillChoiceState extends State<AddBillChoice> {
 
         String filePath = fileResult.files.single.path!;
         File pdfFile = File(filePath);
-        String fileName = fileResult.files.single.name.toLowerCase();
+        fileResult.files.single.name.toLowerCase();
 
         await pdfService.saveExtractedText(pdfFile);
 
