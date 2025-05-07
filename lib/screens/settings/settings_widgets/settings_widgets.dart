@@ -52,8 +52,10 @@ class _SettingsRowState extends State<SettingsRow> {
           onChanged: (value) {
             if(widget.title == 'Descargas') {
               settingsProvider.changeAutoDownloadSetting();
-            } else {
+            } else if (widget.title == 'Notificaciones') {
               settingsProvider.changeNotificationSetting();
+            } else {
+              settingsProvider.changeConvertToUsdSetting();
             }
           },
         ),

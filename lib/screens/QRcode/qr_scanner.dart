@@ -46,7 +46,12 @@ class _QRScannerState extends State<QRScanner> {
   bool checkIfIsUri(String? result) {
     Uri? uri = Uri.tryParse(result!);
     return uri != null && uri.hasScheme && uri.hasAuthority;
-  } 
+  }
+
+  bool checkIfQRContainsValidInfo(String? result) {
+    return result!.length > 20;
+
+  }
 
 
   @override
@@ -56,8 +61,6 @@ class _QRScannerState extends State<QRScanner> {
     _startTimer();
     
   }
-
-  @override
 
   @override
   Widget build(BuildContext context) {
@@ -75,7 +78,6 @@ class _QRScannerState extends State<QRScanner> {
               scannerController.dispose();
               
             } else {
-              print("Formato QR");
               final qrResult = barcodes.first;
       
               if (qrResult.rawValue != null) {
@@ -89,7 +91,12 @@ class _QRScannerState extends State<QRScanner> {
                   .then((value) {
                     var isUri = checkIfIsUri(qrResult.rawValue);
                     if(isUri) {
-                      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => QrcodeLinkScreen(uri: qrResult.rawValue)));
+                      if(checkIfQRContainsValidInfo(qrResult.rawValue))  {
+                        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => QrcodeLinkScreen(uri: qrResult.rawValue)));
+                      } else {
+                        _showSnackbarError("El codigo QR no contiene informacion valida");
+                      }
+                      
                     } else {
                       Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => QrcodeScreen(qrResult: qrResult.rawValue!)));
                     }
@@ -97,16 +104,11 @@ class _QRScannerState extends State<QRScanner> {
                   });
                               
               } else {
-                    _showSnackbarError("ERROR");
-                
+                    _showSnackbarError("ERROR al leer QR");    
               }
               
             }
-      
-            
-            //for(final barcode in barcodes) {
-            //print(barcode.rawValue);
-            //}
+  
           },
           onDetectError:(error, stackTrace) {
             _showSnackbarError(error.toString());

@@ -38,12 +38,6 @@ class _DashboardCarrouselState extends State<DashboardCarrousel> with RouteAware
   }
 
   @override
-  void dispose() {
-    routeObserver.unsubscribe(this);
-    super.dispose();
-  }
-
-  @override
   void didPopNext() {
     // your refresh logic
     fetchFavorites();
@@ -56,10 +50,18 @@ class _DashboardCarrouselState extends State<DashboardCarrousel> with RouteAware
 
     print("Favoritos: $response");
 
-    setState(() {
-      favorites = response;
-    });
+    if(mounted) {
+      setState(() {
+        favorites = response;
+      });
+    }
+    
+  }
 
+   @override
+  void dispose() {
+    routeObserver.unsubscribe(this);
+    super.dispose();
   }
 
   @override

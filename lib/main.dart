@@ -1,5 +1,4 @@
 import 'package:firebase_core/firebase_core.dart';
-//import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:smartbill/screens/cryptocurrencies/crypto_currency.dart';
@@ -9,7 +8,6 @@ import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:smartbill/services/crypto_provider.dart';
 import 'package:smartbill/services/settings.dart';
 import './route_observer.dart';
-
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

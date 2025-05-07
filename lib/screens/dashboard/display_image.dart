@@ -35,6 +35,12 @@ class _DisplayImageScreenState extends State<DisplayImageScreen> {
     _extractData();
   }
 
+  //Preprocessing
+  String normalizeSeparators(String input) {
+    // Remove spaces around dots or commas
+    return input.replaceAll(RegExp(r'\s*([.,])\s*'), r'\1');
+  }
+
 
   void _extractData() {
     List<String> extractedLines = widget.recognizedText!.split('\n');
@@ -52,15 +58,22 @@ class _DisplayImageScreenState extends State<DisplayImageScreen> {
     List<double> moneyValues = [];
     String companyName = '';
 
-    for (var item in extractedLines) {
+    for (var raw in extractedLines) {
+
+      var item = raw.trim();
+
       // Check for dates
       for (final match in dateRegex.allMatches(item)) {
         dates.add(match.group(0)!);
       }
 
+
+      if(item.toLowerCase().startsWith('nit')) {
+        nitValues.add(item.substring(4,).trim());
+      }
       // Extract NIT
       final nitMatch = nitRegex.firstMatch(item);
-      if (nitMatch != null) {
+      if (nitMatch != null && nitValues.isEmpty) {
         String rawNit = nitMatch.group(1)!;
         String cleanedNit = rawNit.replaceAll('.', '');
         nitValues.add(cleanedNit);

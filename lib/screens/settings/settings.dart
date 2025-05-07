@@ -56,9 +56,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
         child: Column(
           children: [
             SettingsRow(settingsValue: settings.autoDownloadOn, title: "Descargas", subtitle: "Descargar facturas de links automáticamente"),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
             SettingsRow(settingsValue: settings.notificationsOn, title: "Notificaciones", subtitle: "Activar notificaciones"),
-            const SizedBox(height: 40),
+            const SizedBox(height: 12),
+            SettingsRow(settingsValue: settings.convertToUSD, title: "Convertir", subtitle: "Convertir todas las facturas a dolar"),
+            const SizedBox(height: 30),
             myUser.isEmpty
             ? const Column(children: [Text("Cargando información del usuario..."), SizedBox(height:10), CircularProgressIndicator()] )
             : Expanded(

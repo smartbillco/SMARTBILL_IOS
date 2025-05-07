@@ -19,7 +19,7 @@ class PdfHandler {
     try {
       
       if(isColonAfterNumFac(qrResult)) {
-        List lines = qrResult.contains(' ') ? qrResult.split(' ') : qrResult.split('\n');
+        List lines = qrResult.contains('\n') ? qrResult.split('\n') : qrResult.split(' ');
         List qrList = lines.map((item) => item.split(':').last).toList();
         List keys = ['bill_number', 'date', 'time', 'nit', 'customer_id', 'amount_before_iva', 'iva', 'other_tax', 'total_amount', 'cufe', 'dian_link'];
 
@@ -38,7 +38,7 @@ class PdfHandler {
         return qrPdf;
 
       } else {
-        List lines = qrResult.contains(' ') ? qrResult.split(' ') : qrResult.split('\n');
+        List lines = qrResult.contains('\n') ? qrResult.split('\n') : qrResult.split(' ');
         List qrList = lines.map((item) => item.split('=')[1].split(' ')[0]).toList();
         List keys = ['bill_number', 'date', 'time', 'nit', 'customer_id', 'amount_before_iva', 'iva', 'other_tax', 'total_amount', 'cufe', 'dian_link'];
 

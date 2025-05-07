@@ -109,7 +109,7 @@ class _QrcodeLinkScreenState extends State<QrcodeLinkScreen> {
               }
             },
             onReceivedHttpError: (controller, request, errorResponse) {
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Se presento un error: $errorResponse")));
+              
             },
           ),
       ),
