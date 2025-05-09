@@ -45,7 +45,7 @@ class _QRScannerState extends State<QRScanner> {
 
   bool checkIfIsUri(String? result) {
     Uri? uri = Uri.tryParse(result!);
-    return uri != null && uri.hasScheme && uri.hasAuthority;
+    return uri != null && uri.hasScheme && uri.hasAuthority  && result.startsWith("https://catalogo-vpfe.dian.gov.co");
   }
 
   bool checkIfQRContainsValidInfo(String? result) {
@@ -90,15 +90,23 @@ class _QRScannerState extends State<QRScanner> {
                   .then((value) => scannerController.dispose())
                   .then((value) {
                     var isUri = checkIfIsUri(qrResult.rawValue);
-                    if(isUri) {
-                      if(checkIfQRContainsValidInfo(qrResult.rawValue))  {
-                        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => QrcodeLinkScreen(uri: qrResult.rawValue)));
+                    //Check if qr content is valid information
+                    if(qrResult.rawValue!.length > 20) {
+                      //Check if is url or data
+                      if(isUri) {
+                        if(checkIfQRContainsValidInfo(qrResult.rawValue))  {
+                          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => QrcodeLinkScreen(uri: qrResult.rawValue)));
+                        } else {
+                          _showSnackbarError("El codigo QR no contiene informacion valida");
+                        }
+                        
                       } else {
-                        _showSnackbarError("El codigo QR no contiene informacion valida");
+                        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => QrcodeScreen(qrResult: qrResult.rawValue!)));
                       }
-                      
+                      //If information is not valid show snackbar
                     } else {
-                      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => QrcodeScreen(qrResult: qrResult.rawValue!)));
+                      _showSnackbarError("Parece que el código QR no contiene información relevante.");
+                      Navigator.pop(context);
                     }
                       
                   });

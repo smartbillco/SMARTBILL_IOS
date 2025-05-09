@@ -43,7 +43,8 @@ import 'package:path/path.dart';
             iva TEXT,
             other_tax TEXT,
             total_amount TEXT,
-            cufe TEXT
+            cufe TEXT,
+            dian_link
           )
         ''');
 
@@ -135,7 +136,8 @@ import 'package:path/path.dart';
               iva TEXT,
               other_tax TEXT,
               total_amount TEXT,
-              cufe TEXT
+              cufe TEXT,
+              dian_link
             )
           ''');
 
